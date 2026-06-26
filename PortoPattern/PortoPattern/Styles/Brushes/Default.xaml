@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- ========================================== -->
+    <!-- PORTO: SURFACES (ФОНЫ)                     -->
+    <!-- ========================================== -->
+    <SolidColorBrush x:Key="Porto.Surface.Root" Color="#335C67" />
+    <!-- ACRIL BACKGROUND -->
+    <SolidColorBrush x:Key="Porto.Surface.Default" Color="#000000" />
+    <SolidColorBrush x:Key="Porto.Surface.Secondary" Color="#000000" />
+    <SolidColorBrush x:Key="Porto.Surface.Card" Color="#000000" />
+
+    <!-- ========================================== -->
+    <!-- PORTO: ELEMENTS (ЭЛЕМЕНТЫ И ИХ СОСТОЯНИЯ)  -->
+    <!-- ========================================== -->
+    <!-- Default возвращает этот цвет, когда мышь убрали -->
+    <SolidColorBrush x:Key="Porto.Element.Default" Color="#588157" />
+    <SolidColorBrush x:Key="Porto.Element.Hover" Color="#31572c" />
+    <SolidColorBrush x:Key="Porto.Element.Pressed" Color="#540B0E" />
+    <SolidColorBrush x:Key="Porto.Element.Selected" Color="#000000" />
+    <SolidColorBrush x:Key="Porto.Element.Disabled" Color="#000000" />
+
+    <!-- ========================================== -->
+    <!-- PORTO: BORDERS (ГРАНИЦЫ)                   -->
+    <!-- ========================================== -->
+    <SolidColorBrush x:Key="Porto.Border.Default" Color="#ecf39e" />
+    <SolidColorBrush x:Key="Porto.Border.Hover" Color="#e9edc9" />
+    <SolidColorBrush x:Key="Porto.Border.Pressed" Color="#000000" />
+    <SolidColorBrush x:Key="Porto.Border.Focus" Color="#000000" />
+    <SolidColorBrush x:Key="Porto.Border.Disabled" Color="#000000" />
+
+    <!-- ========================================== -->
+    <!-- PORTO: TEXT (ТЕКСТ)                        -->
+    <!-- ========================================== -->
+    <SolidColorBrush x:Key="Porto.Text.Default" Color="#ecf39e" />
+    <SolidColorBrush x:Key="Porto.Text.Hover" Color="#e9edc9" />
+    <SolidColorBrush x:Key="Porto.Text.Header" Color="#bfd7ea" />
+    <SolidColorBrush x:Key="Porto.Text.Pressed" Color="#000000" />
+    <SolidColorBrush x:Key="Porto.Text.Disabled" Color="#000000" />
+
+    <!-- ========================================== -->
+    <!-- PORTO: EFFECTS (ТЕКСТ)                        -->
+    <!-- ========================================== -->
+    <SolidColorBrush x:Key="Porto.Highlighter" Color="#cbeef3" />
+    <SolidColorBrush x:Key="Porto.Highlight.Background" Color="Transparent" />
+    <SolidColorBrush x:Key="Porto.Highlight.Foreground" Color="#aaf683" />
+
+</ResourceDictionary>

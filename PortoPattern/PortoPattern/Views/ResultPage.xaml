@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Добавляем x:Name="PageRoot" чтобы ссылаться на контекст страницы изнутри DataTemplate -->
+<Page
+    x:Name="PageRoot"
+    x:Class="PortoPattern.Views.ResultPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:models="using:PortoPattern.Core.Models"
+    xmlns:controls="using:PortoPattern.Controls"
+    Background="Transparent">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Передаем SearchText из ViewModel страницы в наш TopToolBar -->
+        <controls:TopToolBar
+            Grid.Row="0"
+            Title="Результаты сканирования"
+            Subtitle="{x:Bind ViewModel.CategoriesSubtitle, Mode=OneWay}"
+            SearchText="{x:Bind ViewModel.SearchText, Mode=TwoWay}"/>
+
+        <ScrollViewer Grid.Row="1" Padding="24,0,24,24">
+            <ItemsControl ItemsSource="{x:Bind ViewModel.FilteredItems, Mode=OneWay}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VariableSizedWrapGrid Orientation="Horizontal" ItemWidth="210" ItemHeight="110"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="models:FileCategory">
+                        <controls:CompositionShadow 
+                            BlurRadius="28" 
+                            ShadowOpacity="0.3" 
+                            OffsetY="6"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            Margin="10">
+
+                            <controls:CardButton 
+                                Click="OnCategoryClick" 
+                                Style="{StaticResource DefaultCardButtonStyle}"
+                                Background="{StaticResource App.Surface}"
+                                BorderBrush="{StaticResource App.TextSecondary}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                PointerOverBackgroundCustom="{ThemeResource App.Background}"
+                                PointerOverBorderBrushCustom="{StaticResource App.TextPrimary}"
+                                PointerOverForegroundCustom="{StaticResource App.HeaderText}">
+
+                                <StackPanel 
+                                    HorizontalAlignment="Center" 
+                                    VerticalAlignment="Center">
+
+                                    <!-- Заменяем обычный TextBlock на HighlightTextBlock и пробрасываем строку поиска -->
+                                    <controls:HighlightTextBlock
+                                        Text="{x:Bind Extension}"
+                                        HighlightText="{Binding ViewModel.SearchText, ElementName=PageRoot}"
+                                        FontSize="22" 
+                                        FontWeight="Bold"
+                                        HorizontalAlignment="Center"/>
+
+                                    <TextBlock 
+                                        Text="{x:Bind TotalFileCount}" 
+                                        Opacity="0.6" 
+                                        HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </controls:CardButton>
+
+                        </controls:CompositionShadow>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</Page>

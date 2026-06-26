@@ -1,0 +1,1016 @@
+FILE: .\BackdropManager.cs
+----------------------------------------
+// File: BackdropManager.cs
+// Description: Manages the window's acrylic effect and theme synchronization.
+// Optimized for .NET 10 to ensure safe COM interaction and clean disposal.
+
+#nullable enable
+using Microsoft.UI.Composition;
+using Microsoft.UI.Composition.SystemBackdrops;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Controls;
+using System;
+using WinRT;
+
+namespace PortoPattern.Themes;
+
+public sealed class BackdropManager : IDisposable
+{
+    private readonly Window _window;
+    private readonly ThemeService _themeService;
+
+    private DesktopAcrylicController? _acrylicController;
+    private readonly SystemBackdropConfiguration _configurationSource = new();
+    private ICompositionSupportsSystemBackdrop? _backdropTarget;
+
+    private bool _isDisposed;
+
+    public BackdropManager(Window window, ThemeService themeService)
+    {
+        _window = window;
+        _themeService = themeService;
+    }
+
+    public void Initialize()
+    {
+        if (_isDisposed) return;
+
+        try
+        {
+            // ПРАВКА: WinUI 3 требует DispatcherQueue для работы контроллеров фона.
+            // Если его нет в текущем потоке, инициализация может вызывать E_INVALIDARG.
+            if (Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread() == null)
+            {
+#if DEBUG
+                Console.WriteLine("[DEBUG ERROR] BackdropManager: DispatcherQueue is missing.");
+#endif
+                return;
+            }
+
+            _window.Activated += OnWindowActivated;
+            _window.Closed += OnWindowClosed;
+
+            _configurationSource.IsInputActive = true;
+
+            if (DesktopAcrylicController.IsSupported())
+            {
+                _acrylicController = new DesktopAcrylicController();
+                _backdropTarget = _window.As<ICompositionSupportsSystemBackdrop>();
+
+                _acrylicController.AddSystemBackdropTarget(_backdropTarget);
+                _acrylicController.SetSystemBackdropConfiguration(_configurationSource);
+            }
+
+            _themeService.PropertyChanged += OnThemeChanged;
+            Apply(_themeService.CurrentTheme);
+        }
+        catch (Exception ex)
+        {
+#if DEBUG
+            Console.WriteLine($"[DEBUG ERROR] BackdropManager.Initialize: {ex.Message}");
+#endif
+        }
+    }
+
+    private void OnWindowActivated(object sender, WindowActivatedEventArgs args)
+    {
+        if (_isDisposed) return;
+        _configurationSource.IsInputActive = args.WindowActivationState != WindowActivationState.Deactivated;
+    }
+
+    private void OnThemeChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (_isDisposed) return;
+        if (e.PropertyName == nameof(ThemeService.CurrentTheme))
+        {
+            Apply(_themeService.CurrentTheme);
+        }
+    }
+
+    private void OnWindowClosed(object sender, WindowEventArgs args) => Dispose();
+
+    private void Apply(ThemePalette palette)
+    {
+        if (_isDisposed) return;
+
+        try
+        {
+            var color = palette.SurfaceColor;
+
+            if (_acrylicController != null)
+            {
+                _acrylicController.TintColor = color;
+                _acrylicController.FallbackColor = color;
+                _acrylicController.TintOpacity = palette.TintOpacity;
+            }
+            else if (_window.Content is FrameworkElement element)
+            {
+                // Fallback для систем, не поддерживающих Acrylic
+                var brush = new SolidColorBrush(color);
+                if (element is Control control) control.Background = brush;
+                else if (element is Panel panel) panel.Background = brush;
+            }
+        }
+        catch (Exception ex)
+        {
+#if DEBUG
+            Console.WriteLine($"[DEBUG ERROR] BackdropManager.Apply: {ex.Message}");
+#endif
+        }
+    }
+
+    public void Dispose()
+    {
+        if (_isDisposed) return;
+        _isDisposed = true;
+
+        try
+        {
+            _themeService.PropertyChanged -= OnThemeChanged;
+            _window.Activated -= OnWindowActivated;
+            _window.Closed -= OnWindowClosed;
+
+            if (_acrylicController != null)
+            {
+                if (_backdropTarget != null)
+                    _acrylicController.RemoveSystemBackdropTarget(_backdropTarget);
+
+                _acrylicController.Dispose();
+                _acrylicController = null;
+            }
+            _backdropTarget = null;
+        }
+        catch (Exception ex)
+        {
+#if DEBUG
+            Console.WriteLine($"[DEBUG ERROR] BackdropManager.Dispose: {ex.Message}");
+#endif
+        }
+    }
+}
+
+========================================
+
+FILE: .\project_dump.txt
+----------------------------------------
+
+================================================================================
+FILE: .\BackdropManager.cs
+================================================================================
+#nullable enable
+using Microsoft.UI.Composition;
+using Microsoft.UI.Composition.SystemBackdrops;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
+using System;
+using WinRT;
+
+namespace PortoPattern.Themes;
+
+/// <summary>
+/// Менеджер фоновых эффектов окна (Acrylic / fallback).
+/// Контролирует:
+/// - жизненный цикл Acrylic
+/// - реакцию на фокус окна
+/// - применение темы
+/// </summary>
+public sealed class BackdropManager : IDisposable
+{
+    private readonly Window _window;
+    private readonly ThemeService _themeService;
+
+    private DesktopAcrylicController? _acrylicController;
+    private readonly SystemBackdropConfiguration _configurationSource = new();
+    private ICompositionSupportsSystemBackdrop? _backdropTarget;
+
+    private bool _isDisposed;
+
+    public BackdropManager(Window window, ThemeService themeService)
+    {
+        _window = window;
+        _themeService = themeService;
+    }
+
+    public void Initialize()
+    {
+        if (_isDisposed) return;
+
+        try
+        {
+            _window.Activated += OnWindowActivated;
+            _window.Closed += OnWindowClosed;
+
+            // стартовое состояние — окно активно
+            _configurationSource.IsInputActive = true;
+
+            if (DesktopAcrylicController.IsSupported())
+            {
+                _acrylicController = new DesktopAcrylicController();
+
+                _backdropTarget = _window.As<ICompositionSupportsSystemBackdrop>();
+                _acrylicController.AddSystemBackdropTarget(_backdropTarget);
+                _acrylicController.SetSystemBackdropConfiguration(_configurationSource);
+            }
+
+            _themeService.PropertyChanged += OnThemeChanged;
+
+            Apply(_themeService.CurrentTheme);
+        }
+        catch (Exception ex)
+        {
+#if DEBUG
+            System.Diagnostics.Debug.WriteLine($"[BackdropManager] Init error: {ex.Message}");
+#endif
+        }
+    }
+
+    /// <summary>
+    /// Переключение active / inactive состояния окна
+    /// </summary>
+    private void OnWindowActivated(object sender, WindowActivatedEventArgs args)
+    {
+        if (_isDisposed) return;
+
+        // true  → Acrylic (Tint + blur)
+        // false → fallback (без blur)
+        _configurationSource.IsInputActive =
+            args.WindowActivationState != WindowActivationState.Deactivated;
+    }
+
+    private void OnThemeChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (_isDisposed) return;
+
+        if (e.PropertyName == nameof(ThemeService.CurrentTheme))
+        {
+            Apply(_themeService.CurrentTheme);
+        }
+    }
+
+    private void OnWindowClosed(object sender, WindowEventArgs args)
+    {
+        Dispose();
+    }
+
+    /// <summary>
+    /// Применение темы
+    /// </summary>
+    private void Apply(ThemePalette palette)
+    {
+        try
+        {
+            // единый цвет темы
+            var color = palette.SurfaceColor;
+
+            if (_acrylicController != null)
+            {
+                /// =========================================
+                /// Acrylic режим
+                /// =========================================
+
+                _acrylicController.TintColor = color;
+                /*
+                 * Основной цвет при активном окне (с blur)
+                 */
+
+                _acrylicController.FallbackColor = color;
+                /*
+                 * Тот же цвет при НЕактивном окне (без blur)
+                 * → устраняет визуальный "скачок" темы
+                 */
+
+                _acrylicController.TintOpacity = palette.TintOpacity;
+                /*
+                 * Влияет только на активное состояние
+                 */
+            }
+            else
+            {
+                /// =========================================
+                /// Полный fallback (если Acrylic не поддерживается)
+                /// =========================================
+
+                var brush = new SolidColorBrush(color);
+                /*
+                 * Используем тот же SurfaceColor
+                 * → единое поведение независимо от платформы
+                 */
+
+                if (_window.Content is Panel p)
+                    p.Background = brush;
+                else if (_window.Content is Control c)
+                    c.Background = brush;
+                else if (_window.Content is Border b)
+                    b.Background = brush;
+            }
+        }
+        catch (Exception ex)
+        {
+#if DEBUG
+            System.Diagnostics.Debug.WriteLine($"[BackdropManager] Apply error: {ex.Message}");
+#endif
+        }
+    }
+
+    public void Dispose()
+    {
+        if (_isDisposed) return;
+        _isDisposed = true;
+
+        try
+        {
+            _themeService.PropertyChanged -= OnThemeChanged;
+
+            _window.Activated -= OnWindowActivated;
+            _window.Closed -= OnWindowClosed;
+
+            if (_acrylicController != null)
+            {
+                if (_backdropTarget != null)
+                {
+                    _acrylicController.RemoveSystemBackdropTarget(_backdropTarget);
+                }
+
+                _acrylicController.Dispose();
+                _acrylicController = null;
+            }
+
+            _backdropTarget = null;
+
+#if DEBUG
+            System.Diagnostics.Debug.WriteLine("[BackdropManager] Disposed");
+#endif
+        }
+        catch (Exception ex)
+        {
+#if DEBUG
+            System.Diagnostics.Debug.WriteLine($"[BackdropManager] Dispose error: {ex.Message}");
+#endif
+        }
+    }
+}
+
+
+
+
+================================================================================
+FILE: .\Styles.xaml
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ResourceDictionary.MergedDictionaries>
+
+        <!-- Базовые контролы WinUI -->
+        <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+
+        <!-- Темы приложения -->
+        <ResourceDictionary Source="ms-appx:///Themes/Styles/Purple.xaml"/>
+        <ResourceDictionary Source="ms-appx:///Themes/Styles/TealLavender.xaml"/>
+        <ResourceDictionary Source="ms-appx:///Themes/Styles/CoralMint.xaml"/>
+
+    </ResourceDictionary.MergedDictionaries>
+
+</ResourceDictionary>
+
+
+
+
+================================================================================
+FILE: .\ThemePalette.cs
+================================================================================
+#nullable enable
+using System;
+using Windows.UI;
+
+namespace PortoPattern.Themes;
+
+/// <summary>
+/// Палитра темы.
+/// ВАЖНО:
+/// Теперь используется ЕДИНЫЙ цвет SurfaceColor для всех состояний:
+/// - active (Acrylic Tint)
+/// - inactive (FallbackColor)
+///
+/// BackgroundColor и AccentColor оставлены только для расширения,
+/// но в текущей архитектуре НЕ используются в BackdropManager.
+/// </summary>
+public record ThemePalette(
+    string Name,
+
+    /// <summary>
+    /// ОСНОВНОЙ ЦВЕТ ТЕМЫ
+    /// Используется:
+    /// - как TintColor (активное окно)
+    /// - как FallbackColor (неактивное окно)
+    /// - как fallback UI background
+    /// </summary>
+    Color SurfaceColor,
+
+    /// <summary>
+    /// РЕЗЕРВНЫЙ ЦВЕТ (НЕ ИСПОЛЬЗУЕТСЯ В ТЕКУЩЕМ RENDER PIPELINE)
+    /// Оставлен для возможного расширения UI (не Acrylic)
+    /// </summary>
+    Color BackgroundColor,
+
+    /// <summary>
+    /// АКЦЕНТНЫЙ ЦВЕТ (НЕ ИСПОЛЬЗУЕТСЯ В BackdropManager)
+    /// Зарезервирован под UI элементы (кнопки, выделения и т.д.)
+    /// </summary>
+    Color AccentColor,
+
+    float TintOpacity = 0.5f)
+{
+    /// <summary>
+    /// Purple — монохромная фиолетовая тема
+    /// </summary>
+    public static readonly ThemePalette Purple = new(
+        "Purple",
+        ColorHelper.FromHex("#7C3AED"),
+        ColorHelper.FromHex("#DDD6FE"),
+        ColorHelper.FromHex("#5B21B6")
+    );
+
+    /// <summary>
+    /// Teal — монохромная бирюзовая тема
+    /// </summary>
+    public static readonly ThemePalette TealLavender = new(
+        "TealLavender",
+        ColorHelper.FromHex("#0D9488"),
+        ColorHelper.FromHex("#CCFBF1"),
+        ColorHelper.FromHex("#115E59")
+    );
+
+    /// <summary>
+    /// Coral — монохромная тёплая тема
+    /// </summary>
+    public static readonly ThemePalette CoralMint = new(
+        "CoralMint",
+        ColorHelper.FromHex("#F97316"),
+        ColorHelper.FromHex("#FED7AA"),
+        ColorHelper.FromHex("#C2410C")
+    );
+}
+
+/// <summary>
+/// HEX → Color конвертер
+/// Без изменений — универсальный утилитный класс
+/// </summary>
+public static class ColorHelper
+{
+    public static Color FromHex(string hex)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(hex))
+                throw new ArgumentException("HEX string cannot be null or empty.");
+
+            string cleanHex = hex.Replace("#", string.Empty);
+
+            if (cleanHex.Length != 6 && cleanHex.Length != 8)
+                throw new ArgumentException($"Invalid hex color code length: {hex}");
+
+            byte a = 255;
+            int offset = 0;
+
+            if (cleanHex.Length == 8)
+            {
+                a = Convert.ToByte(cleanHex[..2], 16);
+                offset = 2;
+            }
+
+            byte r = Convert.ToByte(cleanHex.Substring(offset, 2), 16);
+            byte g = Convert.ToByte(cleanHex.Substring(offset + 2, 2), 16);
+            byte b = Convert.ToByte(cleanHex.Substring(offset + 4, 2), 16);
+
+            return Color.FromArgb(a, r, g, b);
+        }
+        catch
+        {
+            return Color.FromArgb(0, 0, 0, 0);
+        }
+    }
+}
+
+
+
+
+================================================================================
+FILE: .\ThemeService.cs
+================================================================================
+#nullable enable
+using CommunityToolkit.Mvvm.ComponentModel;
+using System.Collections.Generic;
+using System.Diagnostics;
+
+namespace PortoPattern.Themes;
+
+/// <summary>
+/// Глобальный сервис тем.
+/// Отвечает ТОЛЬКО за:
+/// - выбор активной темы
+/// - уведомление UI о смене темы
+///
+/// НЕ содержит логики цветов и рендера.
+/// </summary>
+public partial class ThemeService : ObservableObject
+{
+    /// <summary>
+    /// Активная тема приложения.
+    /// Любое изменение триггерит обновление BackdropManager.
+    /// </summary>
+    [ObservableProperty]
+    private ThemePalette _currentTheme;
+
+    /// <summary>
+    /// Список доступных тем (UI picker)
+    /// </summary>
+    public IReadOnlyList<ThemePalette> AvailableThemes { get; }
+
+    public ThemeService()
+    {
+        AvailableThemes = new List<ThemePalette>
+        {
+            ThemePalette.Purple,
+            ThemePalette.TealLavender,
+            ThemePalette.CoralMint
+        };
+
+        // стартовая тема
+        CurrentTheme = ThemePalette.TealLavender;
+    }
+
+    /// <summary>
+    /// Генерируется CommunityToolkit при смене CurrentTheme
+    /// </summary>
+    partial void OnCurrentThemeChanged(ThemePalette value)
+    {
+#if DEBUG
+        Debug.WriteLine($"[ThemeService] Theme changed → {value.Name}");
+#endif
+    }
+}
+
+
+
+
+================================================================================
+FILE: .\Runtime\ThemeManager.cs
+================================================================================
+#nullable enable
+using Microsoft.UI.Xaml;
+using System;
+
+namespace PortoPattern.Themes.Runtime;
+
+/// <summary>
+/// Управляет активной темой приложения через замену ResourceDictionary.
+/// Загружает ТОЛЬКО одну тему одновременно.
+/// </summary>
+public sealed class ThemeManager
+{
+    private readonly ResourceDictionary _appResources;
+
+    private ResourceDictionary? _currentThemeDictionary;
+
+    public ThemeManager(ResourceDictionary appResources)
+    {
+        _appResources = appResources;
+    }
+
+    /// <summary>
+    /// Применение темы по имени (строго: Purple / TealLavender / CoralMint)
+    /// </summary>
+    public void ApplyTheme(string themeName)
+    {
+        var uri = themeName switch
+        {
+            "Purple" => "ms-appx:///Themes/Styles/Purple.xaml",
+            "TealLavender" => "ms-appx:///Themes/Styles/TealLavender.xaml",
+            "CoralMint" => "ms-appx:///Themes/Styles/CoralMint.xaml",
+
+            // fallback
+            _ => "ms-appx:///Themes/Styles/CoralMint.xaml"
+        };
+
+        var newThemeDictionary = new ResourceDictionary
+        {
+            Source = new Uri(uri)
+        };
+
+        // удаляем предыдущую тему (если была)
+        if (_currentThemeDictionary != null)
+        {
+            _appResources.MergedDictionaries.Remove(_currentThemeDictionary);
+        }
+
+        // добавляем новую тему
+        _appResources.MergedDictionaries.Add(newThemeDictionary);
+
+        // фиксируем активную тему
+        _currentThemeDictionary = newThemeDictionary;
+    }
+}
+
+
+
+
+================================================================================
+FILE: .\Styles\CoralMint.xaml
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- CORAL MINT THEME -->
+
+    <SolidColorBrush x:Key="App.Background" Color="#F97316"/>
+    <SolidColorBrush x:Key="App.Surface" Color="#EA580C"/>
+
+    <SolidColorBrush x:Key="App.HeaderText" Color="#FFF7ED"/>
+    <SolidColorBrush x:Key="App.TextPrimary" Color="#FFEDD5"/>
+    <SolidColorBrush x:Key="App.TextSecondary" Color="#FED7AA"/>
+
+</ResourceDictionary>
+
+
+
+
+================================================================================
+FILE: .\Styles\Purple.xaml
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- PURPLE THEME -->
+
+    <!-- Маппинг в универсальные ключи App.* -->
+    <SolidColorBrush x:Key="App.Background" Color="#7C3AED"/>
+    <SolidColorBrush x:Key="App.Surface" Color="#6D28D9"/>
+
+    <SolidColorBrush x:Key="App.HeaderText" Color="#F5F3FF"/>
+    <SolidColorBrush x:Key="App.TextPrimary" Color="#EDE9FE"/>
+    <SolidColorBrush x:Key="App.TextSecondary" Color="#C4B5FD"/>
+
+</ResourceDictionary>
+
+
+
+
+================================================================================
+FILE: .\Styles\TealLavender.xaml
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- TEAL LAVENDER THEME -->
+
+    <SolidColorBrush x:Key="App.Background" Color="#0D9488"/>
+    <SolidColorBrush x:Key="App.Surface" Color="#0F766E"/>
+
+    <SolidColorBrush x:Key="App.HeaderText" Color="#ECFEFF"/>
+    <SolidColorBrush x:Key="App.TextPrimary" Color="#CCFBF1"/>
+    <SolidColorBrush x:Key="App.TextSecondary" Color="#99F6E4"/>
+
+</ResourceDictionary>
+
+
+
+
+========================================
+
+FILE: .\Styles.xaml
+----------------------------------------
+<?xml version="1.0" encoding="utf-8"?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ResourceDictionary.MergedDictionaries>
+
+        <!-- Базовые контролы WinUI -->
+        <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+
+        <!-- Темы приложения -->
+        <ResourceDictionary Source="ms-appx:///Themes/Styles/Purple.xaml"/>
+        <ResourceDictionary Source="ms-appx:///Themes/Styles/TealLavender.xaml"/>
+        <ResourceDictionary Source="ms-appx:///Themes/Styles/CoralMint.xaml"/>
+
+    </ResourceDictionary.MergedDictionaries>
+
+</ResourceDictionary>
+
+========================================
+
+FILE: .\ThemePalette.cs
+----------------------------------------
+#nullable enable
+using System;
+using Windows.UI;
+
+namespace PortoPattern.Themes;
+
+/// <summary>
+/// Палитра темы.
+/// ВАЖНО:
+/// Теперь используется ЕДИНЫЙ цвет SurfaceColor для всех состояний:
+/// - active (Acrylic Tint)
+/// - inactive (FallbackColor)
+///
+/// BackgroundColor и AccentColor оставлены только для расширения,
+/// но в текущей архитектуре НЕ используются в BackdropManager.
+/// </summary>
+public record ThemePalette(
+    string Name,
+
+    /// <summary>
+    /// ОСНОВНОЙ ЦВЕТ ТЕМЫ
+    /// Используется:
+    /// - как TintColor (активное окно)
+    /// - как FallbackColor (неактивное окно)
+    /// - как fallback UI background
+    /// </summary>
+    Color SurfaceColor,
+
+    /// <summary>
+    /// РЕЗЕРВНЫЙ ЦВЕТ (НЕ ИСПОЛЬЗУЕТСЯ В ТЕКУЩЕМ RENDER PIPELINE)
+    /// Оставлен для возможного расширения UI (не Acrylic)
+    /// </summary>
+    Color BackgroundColor,
+
+    /// <summary>
+    /// АКЦЕНТНЫЙ ЦВЕТ (НЕ ИСПОЛЬЗУЕТСЯ В BackdropManager)
+    /// Зарезервирован под UI элементы (кнопки, выделения и т.д.)
+    /// </summary>
+    Color AccentColor,
+
+    float TintOpacity = 0.5f)
+{
+    /// <summary>
+    /// Purple — монохромная фиолетовая тема
+    /// </summary>
+    public static readonly ThemePalette Purple = new(
+        "Purple",
+        ColorHelper.FromHex("#7C3AED"),
+        ColorHelper.FromHex("#DDD6FE"),
+        ColorHelper.FromHex("#5B21B6")
+    );
+
+    /// <summary>
+    /// Teal — монохромная бирюзовая тема
+    /// </summary>
+    public static readonly ThemePalette TealLavender = new(
+        "TealLavender",
+        ColorHelper.FromHex("#0D9488"),
+        ColorHelper.FromHex("#CCFBF1"),
+        ColorHelper.FromHex("#115E59")
+    );
+
+    /// <summary>
+    /// Coral — монохромная тёплая тема
+    /// </summary>
+    public static readonly ThemePalette CoralMint = new(
+        "CoralMint",
+        ColorHelper.FromHex("#F97316"),
+        ColorHelper.FromHex("#FED7AA"),
+        ColorHelper.FromHex("#C2410C")
+    );
+}
+
+/// <summary>
+/// HEX → Color конвертер
+/// Без изменений — универсальный утилитный класс
+/// </summary>
+public static class ColorHelper
+{
+    public static Color FromHex(string hex)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(hex))
+                throw new ArgumentException("HEX string cannot be null or empty.");
+
+            string cleanHex = hex.Replace("#", string.Empty);
+
+            if (cleanHex.Length != 6 && cleanHex.Length != 8)
+                throw new ArgumentException($"Invalid hex color code length: {hex}");
+
+            byte a = 255;
+            int offset = 0;
+
+            if (cleanHex.Length == 8)
+            {
+                a = Convert.ToByte(cleanHex[..2], 16);
+                offset = 2;
+            }
+
+            byte r = Convert.ToByte(cleanHex.Substring(offset, 2), 16);
+            byte g = Convert.ToByte(cleanHex.Substring(offset + 2, 2), 16);
+            byte b = Convert.ToByte(cleanHex.Substring(offset + 4, 2), 16);
+
+            return Color.FromArgb(a, r, g, b);
+        }
+        catch
+        {
+            return Color.FromArgb(0, 0, 0, 0);
+        }
+    }
+}
+
+========================================
+
+FILE: .\ThemeService.cs
+----------------------------------------
+#nullable enable
+
+using CommunityToolkit.Mvvm.ComponentModel;
+using System.Collections.Generic;
+using System.Diagnostics;
+
+namespace PortoPattern.Themes;
+
+/// <summary>
+/// Глобальный сервис тем.
+/// Отвечает ТОЛЬКО за:
+/// - выбор активной темы
+/// - уведомление UI о смене темы
+/// 
+/// НЕ содержит логики цветов и рендера.
+/// </summary>
+public partial class ThemeService : ObservableObject
+{
+    /// <summary>
+    /// Активная тема приложения.
+    /// Использование partial property обеспечивает совместимость с WinRT marshalling и Native AOT.
+    /// </summary>
+    [ObservableProperty]
+    public partial ThemePalette CurrentTheme { get; set; }
+
+    /// <summary>
+    /// Список доступных тем (UI picker)
+    /// </summary>
+    public IReadOnlyList<ThemePalette> AvailableThemes { get; }
+
+    public ThemeService()
+    {
+        AvailableThemes = new List<ThemePalette>
+        {
+            ThemePalette.Purple,
+            ThemePalette.TealLavender,
+            ThemePalette.CoralMint
+        };
+
+        // Устанавливаем стартовую тему через свойство
+        CurrentTheme = ThemePalette.CoralMint;
+    }
+
+    /// <summary>
+    /// Генерируется CommunityToolkit при смене CurrentTheme.
+    /// </summary>
+    partial void OnCurrentThemeChanged(ThemePalette value)
+    {
+#if DEBUG
+        Debug.WriteLine($"[ThemeService] Theme changed → {value.Name}");
+#endif
+    }
+}
+
+========================================
+
+FILE: .\Runtime\ThemeManager.cs
+----------------------------------------
+#nullable enable
+using Microsoft.UI.Xaml;
+using System;
+
+namespace PortoPattern.Themes.Runtime;
+
+/// <summary>
+/// Управляет активной темой приложения через замену ResourceDictionary.
+/// Загружает ТОЛЬКО одну тему одновременно.
+/// </summary>
+public sealed class ThemeManager
+{
+    private readonly ResourceDictionary _appResources;
+
+    private ResourceDictionary? _currentThemeDictionary;
+
+    public ThemeManager(ResourceDictionary appResources)
+    {
+        _appResources = appResources;
+    }
+
+    /// <summary>
+    /// Применение темы по имени (строго: Purple / TealLavender / CoralMint)
+    /// </summary>
+    public void ApplyTheme(string themeName)
+    {
+        var uri = themeName switch
+        {
+            "Purple" => "ms-appx:///Themes/Styles/Purple.xaml",
+            "TealLavender" => "ms-appx:///Themes/Styles/TealLavender.xaml",
+            "CoralMint" => "ms-appx:///Themes/Styles/CoralMint.xaml",
+
+            // fallback
+            _ => "ms-appx:///Themes/Styles/CoralMint.xaml"
+        };
+
+        var newThemeDictionary = new ResourceDictionary
+        {
+            Source = new Uri(uri)
+        };
+
+        // удаляем предыдущую тему (если была)
+        if (_currentThemeDictionary != null)
+        {
+            _appResources.MergedDictionaries.Remove(_currentThemeDictionary);
+        }
+
+        // добавляем новую тему
+        _appResources.MergedDictionaries.Add(newThemeDictionary);
+
+        // фиксируем активную тему
+        _currentThemeDictionary = newThemeDictionary;
+    }
+}
+
+========================================
+
+FILE: .\Styles\CoralMint.xaml
+----------------------------------------
+<?xml version="1.0" encoding="utf-8"?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- CORAL MINT THEME -->
+
+    <SolidColorBrush x:Key="App.Background" Color="#F97316"/>
+    <SolidColorBrush x:Key="App.Surface" Color="#EA580C"/>
+    <!-- Добавлено -->
+    <SolidColorBrush x:Key="App.Surface.Hover" Color="#FB923C"/>
+    <SolidColorBrush x:Key="App.Border" Color="#FDBA74" Opacity="0.4"/>
+
+    <SolidColorBrush x:Key="App.HeaderText" Color="#FFF7ED"/>
+    <SolidColorBrush x:Key="App.TextPrimary" Color="#FFEDD5"/>
+    <SolidColorBrush x:Key="App.TextSecondary" Color="#FED7AA"/>
+
+</ResourceDictionary>
+
+========================================
+
+FILE: .\Styles\Purple.xaml
+----------------------------------------
+<?xml version="1.0" encoding="utf-8"?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- CORAL MINT THEME -->
+
+    <SolidColorBrush x:Key="App.Background" Color="#F97316"/>
+    <SolidColorBrush x:Key="App.Surface" Color="#EA580C"/>
+    <!-- Добавлено -->
+    <SolidColorBrush x:Key="App.Surface.Hover" Color="#FB923C"/>
+    <SolidColorBrush x:Key="App.Border" Color="#FDBA74" Opacity="0.4"/>
+
+    <SolidColorBrush x:Key="App.HeaderText" Color="#FFF7ED"/>
+    <SolidColorBrush x:Key="App.TextPrimary" Color="#FFEDD5"/>
+    <SolidColorBrush x:Key="App.TextSecondary" Color="#FED7AA"/>
+
+</ResourceDictionary>
+
+========================================
+
+FILE: .\Styles\TealLavender.xaml
+----------------------------------------
+<?xml version="1.0" encoding="utf-8"?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- CORAL MINT THEME -->
+
+    <SolidColorBrush x:Key="App.Background" Color="#F97316"/>
+    <SolidColorBrush x:Key="App.Surface" Color="#EA580C"/>
+    <!-- Добавлено -->
+    <SolidColorBrush x:Key="App.Surface.Hover" Color="#FB923C"/>
+    <SolidColorBrush x:Key="App.Border" Color="#FDBA74" Opacity="0.4"/>
+
+    <SolidColorBrush x:Key="App.HeaderText" Color="#FFF7ED"/>
+    <SolidColorBrush x:Key="App.TextPrimary" Color="#FFEDD5"/>
+    <SolidColorBrush x:Key="App.TextSecondary" Color="#FED7AA"/>
+
+</ResourceDictionary>
+
+========================================
+

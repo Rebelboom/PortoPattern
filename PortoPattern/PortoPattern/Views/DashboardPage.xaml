@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="PortoPattern.Views.DashboardPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="Transparent">
+
+    <Grid Padding="40">
+        <StackPanel Spacing="24" MaxWidth="550" HorizontalAlignment="Left">
+
+            <TextBlock Text="Параметры сканирования" 
+                       Style="{ThemeResource TitleTextBlockStyle}" 
+                       Margin="0,0,0,10"/>
+
+            <StackPanel Spacing="8">
+                <TextBlock Text="Директория для анализа:" 
+                           Style="{ThemeResource BodyTextBlockStyle}" 
+                           FontWeight="SemiBold"/>
+                <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBox Text="{x:Bind ViewModel.SelectedPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                             PlaceholderText="C:\Path\To\Folder..."
+                             VerticalAlignment="Center"/>
+
+                    <Button Grid.Column="1" 
+                            Content="Обзор" 
+                            Command="{x:Bind ViewModel.PickFolderCommand}"
+                            VerticalAlignment="Stretch"
+                            Padding="16,0"/>
+                </Grid>
+            </StackPanel>
+
+            <Slider Header="Глубина вложенности (Nesting)" 
+                    Minimum="1" 
+                    Maximum="6" 
+                    Value="{x:Bind ViewModel.NestingLevel, Mode=TwoWay}"
+                    TickFrequency="1" 
+                    TickPlacement="Outside"/>
+
+            <TextBox Header="Фильтр расширения (необязательно):" 
+                     PlaceholderText="Например: apk или exe"
+                     Text="{x:Bind ViewModel.ExtensionFilter, Mode=TwoWay}"/>
+
+            <!-- [ИЗМЕНЕНИЕ: Начало] Добавлена простая кнопка без иконок -->
+            <Button Content="Настроить черный список"
+                     Command="{x:Bind ViewModel.OpenBlackListCommand}"
+                    HorizontalAlignment="Left"
+                    Margin="0,10,0,0"/>
+            <!-- [ИЗМЕНЕНИЕ: Конец] -->
+
+            <Grid Margin="0,20,0,0">
+                <Button Content="Запустить сканирование" 
+                        Command="{x:Bind ViewModel.StartScanCommand}"
+                        Style="{ThemeResource AccentButtonStyle}"
+                        HorizontalAlignment="Stretch"
+                        Height="45"
+                        Visibility="{x:Bind ViewModel.IsBusy, Mode=OneWay, Converter={StaticResource BooleanVisibilityInverse}}"/>
+
+                <Grid Visibility="{x:Bind ViewModel.IsBusy, Mode=OneWay, Converter={StaticResource BooleanVisibility}}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                        <ProgressRing IsActive="True" Width="25" Height="25"/>
+                        <TextBlock Text="Анализируем файлы..." Opacity="0.7" VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <Button Grid.Column="1" 
+                            Content="Отмена" 
+                            Command="{x:Bind ViewModel.CancelScanCommand}"
+                            Padding="20,0"
+                            Height="45"
+                            VerticalAlignment="Stretch"/>
+                </Grid>
+            </Grid>
+        </StackPanel>
+    </Grid>
+</Page>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="PortoPattern.Views.ShellPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:PortoPattern.ViewModels"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance Type=vm:ShellViewModel, IsDesignTimeCreatable=False}">
+
+    <NavigationView
+        x:Name="RootNavigation"
+        IsBackButtonVisible="Visible"
+        IsBackEnabled="{x:Bind ViewModel.IsBackEnabled, Mode=OneWay}"
+        ItemInvoked="OnItemInvoked"
+        BackRequested="OnBackRequested"
+        PaneDisplayMode="Left">
+
+        <NavigationView.MenuItems>
+            <NavigationViewItem Content="Главная" Tag="Home" Icon="Home" />
+            <NavigationViewItem Content="Дашборд" Tag="Dashboard" Icon="Document" />
+        </NavigationView.MenuItems>
+
+        <NavigationView.FooterMenuItems>
+            <NavigationViewItem Content="О программе" Tag="About" Icon="Help" />
+        </NavigationView.FooterMenuItems>
+
+        <Grid>
+            <Frame x:Name="ContentFrame" />
+        </Grid>
+    </NavigationView>
+</Page>

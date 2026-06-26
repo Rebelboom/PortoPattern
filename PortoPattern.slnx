@@ -1,0 +1,24 @@
+<Solution>
+  <Configurations>
+    <Platform Name="ARM64" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
+  <Folder Name="/Элементы решения/">
+    <File Path="Directory.Packages.props" />
+  </Folder>
+  <Project Path="PortoPattern.Core/PortoPattern.Core.csproj" Id="bc2caa20-3744-418e-991c-7a88987bc77b">
+    <Platform Solution="*|x64" Project="x64" />
+  </Project>
+  <Project Path="PortoPattern/PortoPattern (Package)/PortoPattern.App.wapproj" Type="c7167f0d-bc9f-4e6e-afe1-012c56b48db5">
+    <Deploy />
+  </Project>
+  <Project Path="PortoPattern/PortoPattern/PortoPattern.csproj">
+    <Platform Solution="*|ARM64" Project="ARM64" />
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+  </Project>
+</Solution>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+    Файл: Styles.xaml
+    Описание: Главный словарь ресурсов приложения PortoPattern.
+-->
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ResourceDictionary.MergedDictionaries>
+        <!-- Подключение изолированного файла кистей палитры Coral Mint -->
+        <ResourceDictionary Source="ms-appx:///Styles/Brushes/CoralMint.xaml"/>
+        <ResourceDictionary Source="ms-appx:///Styles/Brushes/Default.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
+
+</ResourceDictionary>

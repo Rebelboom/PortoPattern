@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+    Файл: Brushes.xaml
+    Описание: Изолированные кисти приложения, адаптированные под палитру Coral Mint (#F97316).
+-->
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:media="using:Microsoft.UI.Xaml.Media">
+
+    <!--#region [ Системные и фоновые кисти ]-->
+    <!-- Жгучий глубокий терракотовый фон (для подложек и темных контрастных зон) -->
+    <SolidColorBrush x:Key="BurntBackground" Color="#FF381603" />
+
+    <!-- Базовый полупрозрачный темный (для наложений) -->
+    <SolidColorBrush x:Key="SeeThroughBrush" Color="#601E1E1E" />
+    <!--#endregion-->
+
+    <!--#region [ Статусные градиенты (Инфо, Ошибки, Дебаг) ]-->
+    <!-- Системный Дебаг: Нейтральный серый градиент -->
+    <LinearGradientBrush x:Key="GradientDebugBrush" StartPoint="0,0.2" EndPoint="0,1">
+        <GradientStop Offset="0.0" Color="#FFF0F0F0" />
+        <!-- Светло-серый -->
+        <GradientStop Offset="0.3" Color="#FFA0A0A0" />
+        <!-- Серый -->
+        <GradientStop Offset="1.0" Color="#FF505050" />
+        <!-- Темно-серый -->
+    </LinearGradientBrush>
+
+    <!-- Системный Инфо: Мягкий кораллово-кремовый градиент -->
+    <LinearGradientBrush x:Key="GradientInfoBrush" StartPoint="0,0.2" EndPoint="0,1">
+        <GradientStop Offset="0.0" Color="#FFF7ED" />
+        <!-- Очень светлый крем -->
+        <GradientStop Offset="0.2" Color="#FED7AA" />
+        <!-- Нежный персик -->
+        <GradientStop Offset="1.0" Color="#FDBA74" />
+        <!-- Светло-оранжевый -->
+    </LinearGradientBrush>
+
+    <!-- Системный Важный/Успех: Приглушенный мятно-зеленый (в стиле Coral Mint) -->
+    <LinearGradientBrush x:Key="GradientImportantBrush" StartPoint="0,0.2" EndPoint="0,1">
+        <GradientStop Offset="0.0" Color="#FFF7ED" />
+        <!-- Светлый крем -->
+        <GradientStop Offset="0.2" Color="#A7F3D0" />
+        <!-- Мятно-зеленый светлый -->
+        <GradientStop Offset="1.0" Color="#059669" />
+        <!-- Мятно-изумрудный -->
+    </LinearGradientBrush>
+
+    <!-- Системное Предупреждение: Теплый янтарно-желтый градиент -->
+    <LinearGradientBrush x:Key="GradientWarningBrush" StartPoint="0,0.2" EndPoint="0,1">
+        <GradientStop Offset="0.0" Color="#FFF7ED" />
+        <!-- Светлый крем -->
+        <GradientStop Offset="0.2" Color="#FCD34D" />
+        <!-- Теплый желтый -->
+        <GradientStop Offset="1.0" Color="#D97706" />
+        <!-- Янтарный темный -->
+    </LinearGradientBrush>
+
+    <!-- Системная Ошибка: Плотный кораллово-красный градиент -->
+    <LinearGradientBrush x:Key="GradientErrorBrush" StartPoint="0,0.2" EndPoint="0,1">
+        <GradientStop Offset="0.0" Color="#FFF7ED" />
+        <!-- Светлый крем -->
+        <GradientStop Offset="0.2" Color="#FCA5A5" />
+        <!-- Светло-красный коралловый -->
+        <GradientStop Offset="1.0" Color="#DC2626" />
+        <!-- Насыщенный красный -->
+    </LinearGradientBrush>
+    <!--#endregion-->
+
+    <!--#region [ Градиенты управления (Кнопки и Карточки) ]-->
+    <!-- Кнопка: Обычное состояние (Плавный переход от мандариновой палитры к терракотовой) -->
+    <LinearGradientBrush x:Key="GradientButtonNormalBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Offset="0.0" Color="#FFEDD5" />
+        <!-- Светлый персик -->
+        <GradientStop Offset="0.2" Color="#FB923C" />
+        <!-- Яркий оранжевый -->
+        <GradientStop Offset="0.5" Color="#EA580C" />
+        <!-- Насыщенный коралловый -->
+        <GradientStop Offset="1.0" Color="#9A3412" />
+        <!-- Ржаво-терракотовый -->
+    </LinearGradientBrush>
+
+    <!-- Кнопка: Наведение мыши (Более яркое свечение верхушки) -->
+    <LinearGradientBrush x:Key="GradientButtonPointerOverBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Offset="0.0" Color="#FFF7ED" />
+        <!-- Горящий белый крем -->
+        <GradientStop Offset="0.2" Color="#F97316" />
+        <!-- Базовый Coral Mint -->
+        <GradientStop Offset="0.5" Color="#EA580C" />
+        <!-- Насыщенный коралловый -->
+        <GradientStop Offset="1.0" Color="#7C2D12" />
+        <!-- Темный терракотовый -->
+    </LinearGradientBrush>
+
+    <!-- Кнопка: Нажата (Глубокий темный тон с яркой центральной вспышкой) -->
+    <LinearGradientBrush x:Key="GradientButtonPressedBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Offset="0.0" Color="#9A3412" />
+        <!-- Ржаво-терракотовый -->
+        <GradientStop Offset="0.2" Color="#FFEDD5" />
+        <!-- Вспышка светлого персика -->
+        <GradientStop Offset="0.5" Color="#EA580C" />
+        <!-- Насыщенный коралловый -->
+        <GradientStop Offset="1.0" Color="#431407" />
+        <!-- Почти черный коралловый -->
+    </LinearGradientBrush>
+
+    <!-- Кнопка: Отключена (Выцветшие, серые тона) -->
+    <LinearGradientBrush x:Key="GradientButtonDisabledBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Offset="0.0" Color="#FFA0A0A0" />
+        <!-- Серый -->
+        <GradientStop Offset="0.2" Color="#FF707070" />
+        <!-- Темновато-серый -->
+        <GradientStop Offset="0.5" Color="#FF505050" />
+        <!-- Темно-серый -->
+        <GradientStop Offset="1.0" Color="#FF303030" />
+        <!-- Околочерный серый -->
+    </LinearGradientBrush>
+
+    <!-- Однотонные кисти, переведенные на оранжевую палитру -->
+    <SolidColorBrush x:Key="PrimaryBrush" Color="#FFF7ED"/>
+    <SolidColorBrush x:Key="SecondaryBrush" Color="#EA580C"/>
+    <SolidColorBrush x:Key="BorderBrush" Color="#FB923C"/>
+    <!--#endregion-->
+
+    <!--#region [ Эффекты Fluent Design ]-->
+    <!-- Акриловая кисть для диалогов (Переведена с синего на фирменный кораллово-оранжевый тон темы) -->
+    <media:AcrylicBrush
+        x:Key="CardAcrylicBrush"
+        FallbackColor="#EA580C"
+        TintColor="#EA580C"
+        TintLuminosityOpacity="0.15"
+        TintOpacity="0.25" />
+    <!--#endregion-->
+
+</ResourceDictionary>

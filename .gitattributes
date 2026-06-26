@@ -1,0 +1,117 @@
+# Auto detect text files and normalize line endings
+* text=auto
+
+###############################################################################
+# Line endings
+###############################################################################
+
+# Windows source/project files -> CRLF
+*.sln          text eol=crlf
+*.vcxproj      text eol=crlf
+*.vcproj       text eol=crlf
+*.csproj       text eol=crlf
+*.fsproj       text eol=crlf
+*.vbproj       text eol=crlf
+*.props        text eol=crlf
+*.targets      text eol=crlf
+*.filters      text eol=crlf
+*.user         text eol=crlf
+*.config       text eol=crlf
+*.rc           text eol=crlf
+*.def          text eol=crlf
+*.manifest     text eol=crlf
+*.natvis       text eol=crlf
+
+# Source code
+*.h            text eol=crlf
+*.hpp          text eol=crlf
+*.hh           text eol=crlf
+*.hxx          text eol=crlf
+*.c            text eol=crlf
+*.cc           text eol=crlf
+*.cpp          text eol=crlf
+*.cxx          text eol=crlf
+*.ixx          text eol=crlf
+*.cppm         text eol=crlf
+*.inl          text eol=crlf
+
+# C#
+*.cs           text eol=crlf
+
+# Scripts
+*.bat          text eol=crlf
+*.cmd          text eol=crlf
+*.ps1          text eol=crlf
+
+# Unix scripts stay LF
+*.sh           text eol=lf
+*.py           text eol=lf
+
+###############################################################################
+# Binary files
+###############################################################################
+
+*.png          binary
+*.jpg          binary
+*.jpeg         binary
+*.gif          binary
+*.bmp          binary
+*.ico          binary
+*.tga          binary
+*.dds          binary
+
+*.zip          binary
+*.7z           binary
+*.rar          binary
+*.gz           binary
+*.tar          binary
+
+*.exe          binary
+*.dll          binary
+*.lib          binary
+*.pdb          binary
+*.obj          binary
+*.ilk          binary
+*.pch          binary
+
+*.so           binary
+*.a            binary
+
+*.pdf          binary
+
+*.mp3          binary
+*.wav          binary
+*.ogg          binary
+*.mp4          binary
+*.avi          binary
+
+###############################################################################
+# Visual Studio generated files
+###############################################################################
+
+*.suo          binary
+*.opensdf      binary
+*.sdf          binary
+*.cache        binary
+*.db           binary
+
+###############################################################################
+# Merge behavior
+###############################################################################
+
+# Solution files often conflict badly
+*.sln          merge=union
+
+# Project files are XML
+*.vcxproj      merge=union
+*.csproj       merge=union
+*.props        merge=union
+*.targets      merge=union
+
+###############################################################################
+# Linguist (GitHub)
+###############################################################################
+
+*.natvis linguist-language=XML
+*.ixx    linguist-language=C++
+*.cppm   linguist-language=C++

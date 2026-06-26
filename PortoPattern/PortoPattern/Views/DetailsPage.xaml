@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ****************************************************************************
+// Файл: DetailsPage.xaml
+// Описание: Страница детального просмотра категории.
+// Отображает список папок, используя кастомный контрол FolderCard.
+// **************************************************************************** -->
+<Page
+    x:Class="PortoPattern.Views.DetailsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:PortoPattern.Controls"
+    xmlns:vm="using:PortoPattern.ViewModels"
+    mc:Ignorable="d"
+    Background="Transparent">
+
+    <!-- Левый и нижний отступы страницы -->
+    <Grid Padding="24,24,0,24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- ЗАГОЛОВОК КАТЕГОРИИ -->
+        <TextBlock 
+            Grid.Row="0"
+            Text="{x:Bind ViewModel.Header, Mode=OneWay}" 
+            Style="{ThemeResource SubtitleTextBlockStyle}" 
+            Margin="0,0,0,20"/>
+
+        <!-- СПИСОК ГРУПП (ПАПОК) -->
+        <!-- Добавлен Padding справа (24), чтобы карточки не упирались в скроллбар -->
+        <ScrollViewer Grid.Row="1" 
+                      VerticalScrollBarVisibility="Auto" 
+                      Padding="0,0,24,0">
+            <ItemsControl ItemsSource="{x:Bind ViewModel.Folders, Mode=OneWay}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:FolderCardViewModel">
+                        <!-- Передаем вью-модель папки напрямую в DataContext карточки -->
+                        <controls:FolderCard Margin="0,0,0,12"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</Page>

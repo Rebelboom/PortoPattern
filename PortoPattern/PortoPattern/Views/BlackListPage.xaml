@@ -1,0 +1,185 @@
+<Page
+    x:Class="PortoPattern.Views.BlacklistPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:PortoPattern.Views"
+    xmlns:models="using:PortoPattern.Core.IgnorSpace"
+    xmlns:coreModels="using:PortoPattern.Core.IgnorNew"
+    xmlns:controls="using:PortoPattern.Controls"
+    xmlns:helpers="using:PortoPattern.Helpers"
+    xmlns:viewmodels="using:PortoPattern.ViewModels"
+    x:Name="RootPage"
+    Background="Transparent">
+
+    <Grid Padding="40">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0"
+                    Margin="0,0,0,32"
+                    HorizontalAlignment="Center">
+            <TextBlock Text="Управление профилями исключений"
+                       Style="{ThemeResource TitleTextBlockStyle}"
+                       HorizontalAlignment="Center"/>
+            <TextBlock Text="Настройка системных и пользовательских правил фильтрации данных"
+                       Foreground="Gray"
+                       FontSize="16"
+                       HorizontalAlignment="Center"
+                       Margin="0,4,0,0"/>
+        </StackPanel>
+
+        <Grid Grid.Row="1" MaxWidth="1000" HorizontalAlignment="Stretch">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0"
+                       Text="ДОСТУПНЫЕ ПРОФИЛИ И ПРАВИЛА"
+                       FontWeight="Bold"
+                       Margin="0,0,0,12"
+                       Opacity="0.6"/>
+
+            <Grid Grid.Row="1"
+                  ColumnSpacing="8"
+                  Margin="0,0,0,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBox Text="{x:Bind ViewModel.NewProfileName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         PlaceholderText="Введите имя нового пользовательского профиля..."
+                         VerticalAlignment="Center"/>
+
+                <Button Grid.Column="1"
+                        Content="Создать профиль"
+                        Command="{x:Bind ViewModel.AddProfileCommand}"
+                        VerticalAlignment="Stretch"/>
+            </Grid>
+
+            <controls:CompositionShadow Grid.Row="2"
+                                        BlurRadius="30"
+                                        ShadowOpacity="0.28"
+                                        OffsetY="4"
+                                        VerticalAlignment="Stretch">
+
+                <ListView x:Name="ProfilesList"
+                          ItemsSource="{x:Bind ViewModel.Profiles, Mode=OneWay}"
+                          SelectionMode="None"
+                          Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                          BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                          BorderThickness="1"
+                          CornerRadius="8"
+                          Padding="4">
+
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="viewmodels:BlackListProfileViewModel">
+
+                            <Expander HorizontalAlignment="Stretch"
+                                      HorizontalContentAlignment="Stretch"
+                                      Margin="0,2"
+                                      ExpandDirection="Down">
+
+                                <Expander.Header>
+                                    <Grid HorizontalAlignment="Stretch" Margin="0,-4">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Column="0" 
+                                                   Text="{x:Bind ProfileName, Mode=OneTime}" 
+                                                   FontWeight="Bold" 
+                                                   FontSize="15" 
+                                                   VerticalAlignment="Center"/>
+
+                                        <CheckBox Grid.Column="1" 
+                                                  Content="Глобально" 
+                                                  IsChecked="{x:Bind IsGlobalMode, Mode=TwoWay}" 
+                                                  IsEnabled="{Binding IsSystem, Converter={StaticResource BoolNegationConverter}}"
+                                                  Margin="0,0,12,0" 
+                                                  VerticalAlignment="Center"/>
+
+                                        <TextBlock Grid.Column="2"
+                                                   Text="{x:Bind ObservableRules.Count, Mode=OneWay}"
+                                                   Opacity="0.5"
+                                                   Margin="0,0,16,0"
+                                                   VerticalAlignment="Center"/>
+
+                                        <Button Grid.Column="3" 
+                                                Content="&#xE74D;" 
+                                                FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                                                Background="Transparent"
+                                                BorderBrush="Transparent"
+                                                Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                                                Command="{Binding DataContext.RemoveProfileCommand, ElementName=ProfilesList}" 
+                                                CommandParameter="{Binding}"
+                                                Visibility="{x:Bind helpers:ProfileUIHelper.HideIfSystem(IsSystem), Mode=OneWay}"
+                                                ToolTipService.ToolTip="Удалить профиль"
+                                                VerticalAlignment="Center"/>
+                                    </Grid>
+                                </Expander.Header>
+
+                                <Expander.Content>
+                                    <StackPanel Spacing="8">
+
+                                        <Button Content="+ Добавить папку в профиль" 
+                                                HorizontalAlignment="Stretch"
+                                                Command="{Binding DataContext.AddFolderToProfileCommand, ElementName=ProfilesList}" 
+                                                CommandParameter="{Binding}"
+                                                IsEnabled="{Binding IsSystem, Converter={StaticResource BoolNegationConverter}}"/>
+
+                                        <ItemsControl ItemsSource="{x:Bind ObservableRules, Mode=OneWay}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate x:DataType="models:IgnorRule">
+                                                    <Grid Padding="5,4" ColumnSpacing="10">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <!-- FIX: x:Bind → Binding -->
+                                                        <CheckBox Grid.Column="0" 
+                                                                  IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                                                  VerticalAlignment="Center"/>
+
+                                                        <TextBlock Grid.Column="1" Text="{x:Bind RealPath}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" FontSize="13"/>
+                                                        <TextBlock Grid.Column="2" Text="{x:Bind VirtualVariable}" Foreground="Gray" VerticalAlignment="Center" FontSize="12"/>
+                                                        <TextBlock Grid.Column="3" Text="{x:Bind Mode}" Foreground="DodgerBlue" VerticalAlignment="Center" FontSize="12"/>
+
+                                                        <Button Grid.Column="4" 
+                                                                Content="&#xE74D;" 
+                                                                FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                                                                Background="Transparent"
+                                                                BorderBrush="Transparent"
+                                                                Command="{Binding DataContext.RemoveFolderFromProfileCommand, ElementName=ProfilesList}" 
+                                                                CommandParameter="{Binding}"
+                                                                Visibility="{x:Bind helpers:ProfileUIHelper.HideIfSystem(IsSystem), Mode=OneWay}"
+                                                                ToolTipService.ToolTip="Удалить папку"/>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+
+                                    </StackPanel>
+                                </Expander.Content>
+                            </Expander>
+
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </controls:CompositionShadow>
+        </Grid>
+
+    </Grid>
+</Page>

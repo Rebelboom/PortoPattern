@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:PortoPattern.Controls">
+
+    <Style TargetType="local:FolderCard">
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="Margin" Value="16,12"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:FolderCard">
+                    <Border x:Name="CardBorder"
+                            Padding="16" CornerRadius="{TemplateBinding CornerRadius}"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal">
+                                    <VisualState.Setters>
+                                        <Setter Target="Overlay.IsHitTestVisible" Value="False" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                                <VisualState x:Name="PointerOver">
+                                    <VisualState.Setters>
+                                        <Setter Target="CardBorder.Background" Value="{Binding PointerOverBackgroundCustom, RelativeSource={RelativeSource TemplatedParent}}" />
+                                        <Setter Target="CardBorder.BorderBrush" Value="{Binding PointerOverBorderBrushCustom, RelativeSource={RelativeSource TemplatedParent}}" />
+                                        <Setter Target="HeaderTxt.Foreground" Value="{Binding PointerOverForegroundCustom, RelativeSource={RelativeSource TemplatedParent}}" />
+                                        <Setter Target="Overlay.Opacity" Value="1" />
+                                        <Setter Target="Overlay.IsHitTestVisible" Value="True" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" Spacing="6" Background="Transparent">
+                                <local:HighlightTextBlock x:Name="HeaderTxt"
+                                           Text="{Binding FolderName}" 
+                                           HighlightText="{TemplateBinding SearchText}"
+                                           FontWeight="Bold" FontSize="16"
+                                           Foreground="{TemplateBinding Foreground}"/>
+
+                                <local:HighlightTextBlock Text="{Binding FileListDisplay}" 
+                                           HighlightText="{TemplateBinding SearchText}"
+                                           FontSize="13" Opacity="0.8" TextWrapping="Wrap"/>
+
+                                <ToolTipService.ToolTip>
+                                    <ToolTip Content="{Binding FullPath}"/>
+                                </ToolTipService.ToolTip>
+                            </StackPanel>
+
+                            <StackPanel x:Name="Overlay" Grid.Column="1" Opacity="0" VerticalAlignment="Top">
+                                <StackPanel.Transitions>
+                                    <TransitionCollection>
+                                        <EntranceThemeTransition FromHorizontalOffset="20" />
+                                    </TransitionCollection>
+                                </StackPanel.Transitions>
+
+                                <Button Content="Открыть папку" 
+                                        Command="{Binding OpenFolderCommand}"
+                                        Style="{ThemeResource DefaultButtonStyle}"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>
