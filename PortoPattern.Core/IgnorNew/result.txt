@@ -1,0 +1,273 @@
+FILE: .\IgnoreItem.cs
+----------------------------------------
+// Файл: IgnoreItem.cs
+// Описание: Базовая модель для левой части UI (Системные/Базовые папки).
+// Представляет собой летучее состояние в памяти (сбрасывается при перезапуске).
+
+#nullable enable
+using System.Security.Principal;
+
+namespace PortoPattern.Core.IgnorNew;
+
+public class IgnoreItem
+{
+    // ==========================================
+    // Блок 1: Основные свойства данных
+    // ==========================================
+
+    // Строковое имя папки или путь
+    public string FolderName { get; set; } = string.Empty;
+
+    // Флаг состояния (игнорировать / не игнорировать)
+    public bool IsChecked { get; set; }
+
+    // Маркер того, что это системная папка (требует прав админа)
+    public bool IsSystem { get; set; }
+
+    // Маркер персистентности (указывает, что правило живет только в ОЗУ)
+    public bool IsPersistent { get; } = false;
+
+    // ==========================================
+    // Блок 2: Логика доступа и UI
+    // ==========================================
+
+    // Вычисляемое свойство для блокировки чекбокса в UI.
+    // Если папка не системная — доступно всем. Если системная — только админам.
+    public bool IsEnableInUI => !IsSystem || IsUserAdministrator();
+
+    // ==========================================
+    // Блок 3: Инфраструктура безопасности
+    // ==========================================
+
+    private static bool? _isAdmin;
+
+    // Проверка текущего пользователя на наличие прав Администратора Windows
+    public static bool IsUserAdministrator()
+    {
+        if (_isAdmin.HasValue) return _isAdmin.Value;
+
+        try
+        {
+            using var identity = WindowsIdentity.GetCurrent();
+            var principal = new WindowsPrincipal(identity);
+            _isAdmin = principal.IsInRole(WindowsBuiltInRole.Administrator);
+        }
+        catch (System.Exception ex)
+        {
+            _isAdmin = false;
+#if DEBUG
+            System.Console.WriteLine($"[DEBUG ERROR]: Failed to check administrator role. {ex.Message}");
+#endif
+        }
+
+        return _isAdmin.Value;
+    }
+}
+
+========================================
+
+FILE: .\IgnorProfileConstants.cs
+----------------------------------------
+// Файл: IgnorProfileConstants.cs
+// Описание: Содержит константы и предопределенные списки системных папок для генерации защищенных профилей.
+// Данные используются как источник истины вместо использования перечислений (Enum).
+
+#nullable enable
+using System.Collections.Generic;
+
+namespace PortoPattern.Core.IgnorNew;
+
+public static class IgnorProfileConstants
+{
+    // Имена системных профилей для отображения в UI
+    public const string AdminProfileName = "Системный профиль (Защищенный)";
+    public const string UserProfileName = "Системный профиль (Стандартный)";
+
+    // Список папок, требующих прав администратора для изменения состояния игнорирования.
+    // Изменение этих путей может повлиять на стабильность системы, поэтому они защищены.
+    public static readonly IReadOnlyList<string> ProtectedFolders = new List<string>
+    {
+        "System Volume Information",
+        "$RECYCLE.BIN",
+        "$SysReset",
+        "Windows",
+        "Config.Msi",
+        "ICIPASS"
+    }.AsReadOnly();
+
+    // Список стандартных папок, которые по умолчанию добавлены в систему, но не требуют 
+    // критического уровня защиты для модификации правил.
+    public static readonly IReadOnlyList<string> UnprotectedFolders = new List<string>
+    {
+        "Program Files",
+        "Program Files (x86)",
+        "ProgramData",
+        "Users",
+        "AppData"
+    }.AsReadOnly();
+}
+
+========================================
+
+FILE: .\Protected.cs
+----------------------------------------
+// Файл: Protected.cs
+// Описание: Перечисление системных папок (Левая сторона). 
+// Требуют прав администратора для снятия/установки флага игнорирования.
+
+#nullable enable
+namespace PortoPattern.Core.IgnorNew;
+
+// ==========================================
+// Блок 1: Перечисление сущностей
+// ==========================================
+public enum ProtectedFolder
+{
+    SystemVolumeInformation,
+    RecycleBin,
+    SysReset,
+    Windows,
+    ConfigMsi,
+    ICIPASS
+}
+
+// ==========================================
+// Блок 2: Методы расширения (Маппинг)
+// ==========================================
+public static class ProtectedFolderExtensions
+{
+    // Возвращает строковые имена папок, включая спецсимволы и пробелы
+    public static string GetFolderName(this ProtectedFolder folder) => folder switch
+    {
+        ProtectedFolder.SystemVolumeInformation => "System Volume Information",
+        ProtectedFolder.RecycleBin => "$RECYCLE.BIN",
+        ProtectedFolder.SysReset => "$SysReset",
+        ProtectedFolder.Windows => "Windows",
+        ProtectedFolder.ConfigMsi => "Config.Msi",
+        ProtectedFolder.ICIPASS => "ICIPASS",
+        _ => string.Empty
+    };
+}
+
+========================================
+
+FILE: .\SystemProfileFactory.cs
+----------------------------------------
+// Файл: SystemProfileFactory.cs
+// Описание: Фабрика для генерации и внедрения системных профилей в общий список.
+// Гарантирует, что защищенные профили всегда существуют в приложении и не могут быть удалены пользователем.
+
+#nullable enable
+using System.Collections.Generic;
+using System.Linq;
+using PortoPattern.Core.IgnorSpace;
+
+namespace PortoPattern.Core.IgnorNew;
+
+public static class SystemProfileFactory
+{
+    /// <summary>
+    /// Проверяет наличие системных профилей в списке и добавляет их, если они отсутствуют.
+    /// Выполняет инициализацию, если коллекция была пустой или повреждена.
+    /// </summary>
+    public static void EnsureSystemProfilesExist(List<BlackListProfile> profiles)
+    {
+        // Инициализируем генератор правил для создания корректных VirtualVariable на основе путей
+        var generator = new IgnorRuleGenerator();
+
+        // Проверяем и добавляем защищенный (администраторский) профиль, если он отсутствует
+        if (!profiles.Any(p => p.ProfileName == IgnorProfileConstants.AdminProfileName))
+        {
+            // Вставляем в самое начало (индекс 0), чтобы они отображались первыми в UI
+            profiles.Insert(0, CreateProfile(
+                IgnorProfileConstants.AdminProfileName,
+                IgnorProfileConstants.ProtectedFolders,
+                generator,
+                requiresAdmin: true,
+                defaultChecked: true));
+        }
+
+        // Проверяем и добавляем стандартный системный профиль, если он отсутствует
+        if (!profiles.Any(p => p.ProfileName == IgnorProfileConstants.UserProfileName))
+        {
+            // Вставляем после администраторского профиля
+            profiles.Insert(1, CreateProfile(
+                IgnorProfileConstants.UserProfileName,
+                IgnorProfileConstants.UnprotectedFolders,
+                generator,
+                requiresAdmin: false,
+                defaultChecked: true));
+        }
+    }
+
+    /// <summary>
+    /// Вспомогательный метод для формирования объекта BlackListProfile.
+    /// Устанавливает базовые флаги IsSystem и RequiresAdmin.
+    /// </summary>
+    private static BlackListProfile CreateProfile(string name, IReadOnlyList<string> folders, IgnorRuleGenerator generator, bool requiresAdmin, bool defaultChecked)
+    {
+        var profile = new BlackListProfile
+        {
+            ProfileName = name,
+            IsActive = true,
+            IsGlobalMode = true,
+            IsSystem = true, // Флаг, запрещающий удаление через UI
+            RequiresAdmin = requiresAdmin
+        };
+
+        foreach (var folder in folders)
+        {
+            // Создаем правило (isGlobal = true, так как это системные имена папок)
+            var rule = generator.CreateRule(folder, isGlobal: true);
+            if (rule != null)
+            {
+                rule.IsSystem = true; // Правило также защищено от удаления
+                rule.IsChecked = defaultChecked;
+                profile.Rules.Add(rule);
+            }
+        }
+
+        return profile;
+    }
+}
+
+========================================
+
+FILE: .\UnProtected.cs
+----------------------------------------
+// Файл: UnProtected.cs
+// Описание: Перечисление безопасных папок (Левая сторона).
+// Игнорируются по умолчанию, но доступны для изменения любому пользователю.
+
+#nullable enable
+namespace PortoPattern.Core.IgnorNew;
+
+// ==========================================
+// Блок 1: Перечисление сущностей
+// ==========================================
+public enum UnProtectedFolder
+{
+    NodeModules,
+    Git,
+    PnpmStore,
+    SMS906B
+}
+
+// ==========================================
+// Блок 2: Методы расширения (Маппинг)
+// ==========================================
+public static class UnProtectedFolderExtensions
+{
+    // Возвращает корректные имена технических папок для файловой системы
+    public static string GetFolderName(this UnProtectedFolder folder) => folder switch
+    {
+        UnProtectedFolder.NodeModules => "node_modules",
+        UnProtectedFolder.Git => ".git",
+        UnProtectedFolder.PnpmStore => ".pnpm-store",
+        UnProtectedFolder.SMS906B => "SMS906B",
+        _ => string.Empty
+    };
+}
+
+========================================
+

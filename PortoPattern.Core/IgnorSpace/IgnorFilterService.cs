@@ -1,4 +1,10 @@
-﻿#nullable enable
+﻿/******************************************************************************
+ * Файл: IgnorFilterService.cs
+ * Описание: Сервис фильтрации путей. Принимает решение об игнорировании
+ * директории на основе активных правил из IgnorManager.
+ ******************************************************************************/
+
+#nullable enable
 using System;
 using System.IO;
 using System.Linq;
@@ -17,49 +23,61 @@ public class IgnorFilterService
     public bool ShouldIgnore(string directoryPath)
     {
         if (string.IsNullOrWhiteSpace(directoryPath))
-        {
-#if DEBUG
-            Console.WriteLine("[DEBUG ERROR]: directoryPath is null or empty in ShouldIgnore.");
-#endif
             return false;
-        }
 
-        string currentFolderName = Path.GetFileName(directoryPath);
+        string normalizedPath = NormalizePath(directoryPath);
 
-        if (string.IsNullOrEmpty(currentFolderName))
-        {
-            currentFolderName = Path.GetFileName(Path.GetDirectoryName(directoryPath)) ?? string.Empty;
-        }
+        string currentName = GetFolderName(normalizedPath);
 
         var globalRules = _ignorManager.Rules.Where(r => r.Mode == IgnorMode.GlobalName);
         foreach (var rule in globalRules)
         {
-            string targetFolderName = ExtractFolderNameFromRule(rule.RealPath);
-            if (currentFolderName.Equals(targetFolderName, StringComparison.OrdinalIgnoreCase))
-            {
+            string ruleName = GetFolderName(rule.RealPath);
+
+            if (currentName.Equals(ruleName, StringComparison.OrdinalIgnoreCase))
                 return true;
-            }
         }
 
         var exactRules = _ignorManager.Rules.Where(r => r.Mode == IgnorMode.ExactPath);
         foreach (var rule in exactRules)
         {
-            if (directoryPath.Equals(rule.RealPath, StringComparison.OrdinalIgnoreCase))
-            {
+            string rulePath = NormalizePath(rule.RealPath);
+
+            if (normalizedPath.Equals(rulePath, StringComparison.OrdinalIgnoreCase))
                 return true;
-            }
+
+            string ruleWithSep = rulePath.EndsWith(Path.DirectorySeparatorChar)
+                ? rulePath
+                : rulePath + Path.DirectorySeparatorChar;
+
+            if (normalizedPath.StartsWith(ruleWithSep, StringComparison.OrdinalIgnoreCase))
+                return true;
         }
 
         return false;
     }
 
-    private string ExtractFolderNameFromRule(string path)
+    private static string NormalizePath(string path)
     {
-        string name = Path.GetFileName(path);
-        if (string.IsNullOrEmpty(name))
-        {
-            name = Path.GetFileName(Path.GetDirectoryName(path)) ?? string.Empty;
-        }
-        return name;
+        path = Path.GetFullPath(path);
+
+        string root = Path.GetPathRoot(path) ?? "";
+
+        if (string.Equals(path, root, StringComparison.OrdinalIgnoreCase))
+            return path;
+
+        return path.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+    }
+
+    private static string GetFolderName(string path)
+    {
+        string normalized = NormalizePath(path);
+
+        string root = Path.GetPathRoot(normalized) ?? "";
+
+        if (string.Equals(normalized, root, StringComparison.OrdinalIgnoreCase))
+            return root.TrimEnd('\\').TrimEnd(':').ToLowerInvariant();
+
+        return Path.GetFileName(normalized);
     }
 }
