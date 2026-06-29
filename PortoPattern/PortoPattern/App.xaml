@@ -42,6 +42,8 @@
             <Converters:InverseNullToVisibilityConverter x:Key="InverseNullToVisibilityConverter"/>
             <Converters:AdminRequirementConverter x:Key="AdminRequirementConverter" />
             <Converters:BoolNegationConverter x:Key="BoolNegationConverter"/>
+            <Converters:ConvertProfileName x:Key="ProfileNameConverter"/>
+            <Converters:ConvertRuleToTooltip x:Key="RuleTooltipConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
