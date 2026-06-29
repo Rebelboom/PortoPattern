@@ -149,10 +149,19 @@
                                                             <ColumnDefinition Width="Auto"/>
                                                         </Grid.ColumnDefinitions>
 
-                                                        <CheckBox Grid.Column="0" 
-                                                                  IsChecked="{Binding IsChecked, Mode=TwoWay}"
-                                                                  IsEnabled="{Binding RequiresAdmin, Converter={StaticResource AdminRequirementConverter}}"
-                                                                  VerticalAlignment="Center"/>
+                                                        <Grid Grid.Column="0" Background="Transparent" VerticalAlignment="Center">
+
+                                                            <ToolTipService.ToolTip>
+                                                                <ToolTip Visibility="{Binding RequiresAdmin, Converter={StaticResource BooleanVisibility}}">
+                                                                    <TextBlock Text="Для изменения перезапустите от Администратора" Foreground="{ThemeResource SystemFillColorCriticalBrush}"/>
+                                                                </ToolTip>
+                                                            </ToolTipService.ToolTip>
+
+                                                            <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                                                      IsEnabled="{Binding RequiresAdmin, Converter={StaticResource AdminRequirementConverter}}"
+                                                                      VerticalAlignment="Center"
+                                                                      Margin="0"/>
+                                                        </Grid>
 
                                                         <TextBlock Grid.Column="1" Text="{x:Bind RealPath}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" FontSize="13"/>
                                                         <TextBlock Grid.Column="2" Text="{x:Bind VirtualVariable}" Foreground="Gray" VerticalAlignment="Center" FontSize="12"/>
