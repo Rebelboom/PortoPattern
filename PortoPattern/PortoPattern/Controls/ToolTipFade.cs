@@ -1,28 +1,27 @@
 ﻿using System;
 using System.Diagnostics;
-using Microsoft.UI.Composition;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation.Peers;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Hosting;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Animation;
 
 namespace PortoPattern;
 
 public sealed partial class ToolTipFade : ToolTip
 {
-    private Visual? _visual;
-    private Compositor? _compositor;
-    private ScalarKeyFrameAnimation? _fadeInAnimation;
-    private ScalarKeyFrameAnimation? _fadeOutAnimation;
+    #region [Props]
+    private Storyboard? _fadeInStoryboard;
+    private Storyboard? _fadeOutStoryboard;
 
     /// <summary>
-    /// Время появления тултипа в миллисекундах.
+    /// The time it takes for the tooltip to fade in and out, in milliseconds.
     /// </summary>
     public static readonly DependencyProperty FadeTimeProperty = DependencyProperty.Register(
-        nameof(FadeTime),
-        typeof(double),
-        typeof(ToolTipFade),
-        new PropertyMetadata(250d, OnFadeTimeChanged));
+         nameof(FadeTime),
+         typeof(double),
+         typeof(ToolTipFade),
+         new PropertyMetadata(300d, OnFadeTimeChanged));
 
     public double FadeTime
     {
@@ -34,14 +33,24 @@ public sealed partial class ToolTipFade : ToolTip
     {
         if (d is ToolTipFade ctrl)
         {
-            ctrl.UpdateAnimations();
+            ctrl.ChangeFadeTime((double)e.NewValue);
         }
     }
 
+    private void ChangeFadeTime(double value)
+    {
+#if DEBUG
+        Debug.WriteLine($"[INFO] FadeTime is now {value} ms");
+#endif
+        InitializeAnimations();
+    }
+    #endregion
+
     public ToolTipFade()
     {
-        // Оставляем дефолтный стиль, чтобы не ломать шаблон WinUI 3
         DefaultStyleKey = typeof(ToolTip);
+
+        InitializeAnimations();
 
         Opened += OnOpened;
         Closed += OnClosed;
@@ -51,72 +60,75 @@ public sealed partial class ToolTipFade : ToolTip
     {
         base.OnApplyTemplate();
 
-        // Настройки по умолчанию
-        Placement = Microsoft.UI.Xaml.Controls.Primitives.PlacementMode.Mouse;
         Opacity = 0.0;
-
-        // Инициализируем Composition API на основе визуального дерева элемента
-        _visual = ElementCompositionPreview.GetElementVisual(this);
-        _compositor = _visual.Compositor;
-
-        UpdateAnimations();
-    }
-
-    private void UpdateAnimations()
-    {
-        if (_compositor is null) return;
-
-        // Анимация появления (Fade In)
-        _fadeInAnimation = _compositor.CreateScalarKeyFrameAnimation();
-        _fadeInAnimation.InsertKeyFrame(0f, 0f);
-        _fadeInAnimation.InsertKeyFrame(1f, 1f);
-        _fadeInAnimation.Duration = TimeSpan.FromMilliseconds(FadeTime);
-        _fadeInAnimation.Target = "Opacity";
-
-        // Анимация затухания (Fade Out) — делаем чуть быстрее для отзывчивости
-        _fadeOutAnimation = _compositor.CreateScalarKeyFrameAnimation();
-        _fadeOutAnimation.InsertKeyFrame(0f, 1f);
-        _fadeOutAnimation.InsertKeyFrame(1f, 0f);
-        _fadeOutAnimation.Duration = TimeSpan.FromMilliseconds(FadeTime * 0.75);
-        _fadeOutAnimation.Target = "Opacity";
-    }
-
-    private void OnOpened(object sender, RoutedEventArgs e)
-    {
-        if (_visual is null || _fadeInAnimation is null) return;
-
-        _visual.StopAnimation("Opacity");
-        _visual.StartAnimation("Opacity", _fadeInAnimation);
-    }
-
-    private void OnClosed(object sender, RoutedEventArgs e)
-    {
-        if (_visual is null || _fadeOutAnimation is null) return;
-
-        _visual.StopAnimation("Opacity");
-
-        // Используем Scoped Batch, чтобы красиво затушить тултип на Render-потоке
-        var batch = _compositor?.CreateScopedBatch(CompositionBatchTypes.Animation);
-
-        _visual.StartAnimation("Opacity", _fadeOutAnimation);
-
-        if (batch is not null)
-        {
-            batch.Completed += (_, _) =>
-            {
-#if DEBUG
-                Debug.WriteLine("[INFO] ToolTipFade out animation completed completely.");
-#endif
-            };
-            batch.End();
-        }
+        Placement = Microsoft.UI.Xaml.Controls.Primitives.PlacementMode.Mouse;
+        Padding = new Thickness(0);
+        BorderThickness = new Thickness(0);
+        Background = new SolidColorBrush(Microsoft.UI.Colors.Transparent);
     }
 
     protected override AutomationPeer OnCreateAutomationPeer() => new ToolTipFadeAutomationPeer(this);
+
+    private void InitializeAnimations()
+    {
+        #region [Fade In]
+        _fadeInStoryboard = new Storyboard();
+        var fadeInAnimation = new DoubleAnimation
+        {
+            From = 0,
+            To = 1,
+            Duration = TimeSpan.FromMilliseconds(FadeTime),
+            EnableDependentAnimation = true
+        };
+        Storyboard.SetTarget(fadeInAnimation, this);
+        Storyboard.SetTargetProperty(fadeInAnimation, "Opacity");
+
+        _fadeInStoryboard.Children.Add(fadeInAnimation);
+        #endregion
+
+        #region [Fade Out]
+        _fadeOutStoryboard = new Storyboard();
+        var fadeOutAnimation = new DoubleAnimation
+        {
+            From = 1,
+            To = 0,
+            Duration = TimeSpan.FromMilliseconds(FadeTime / 2),
+            EnableDependentAnimation = true
+        };
+        Storyboard.SetTarget(fadeOutAnimation, this);
+        Storyboard.SetTargetProperty(fadeOutAnimation, "Opacity");
+
+        _fadeOutStoryboard.Children.Add(fadeOutAnimation);
+        _fadeOutStoryboard.Completed -= FadeOutStoryboardOnCompleted;
+        _fadeOutStoryboard.Completed += FadeOutStoryboardOnCompleted;
+        #endregion
+    }
+
+    private void FadeOutStoryboardOnCompleted(object? sender, object e)
+    {
+#if DEBUG
+        Debug.WriteLine("[INFO] FadeOutStoryboard was completed.");
+#endif
+        Visibility = Visibility.Collapsed;
+    }
+
+    private void OnOpened(object sender, object e)
+    {
+        Visibility = Visibility.Visible;
+        _fadeInStoryboard?.Begin();
+    }
+
+    private void OnClosed(object sender, object e)
+    {
+#if DEBUG
+        Debug.WriteLine("[INFO] FadeOutStoryboard was started.");
+#endif
+        _fadeOutStoryboard?.Begin();
+    }
 }
 
 /// <summary>
-/// Поддержка UI Automation для кастомного тултипа.
+/// Support for UI automation.
 /// </summary>
 public class ToolTipFadeAutomationPeer(ToolTipFade control) : FrameworkElementAutomationPeer(control)
 {
