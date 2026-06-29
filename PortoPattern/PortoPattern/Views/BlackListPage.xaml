@@ -100,13 +100,7 @@
                                                    FontSize="15" 
                                                    VerticalAlignment="Center"/>
 
-                                        <TextBlock Grid.Column="1"
-                                                   Text="{x:Bind ObservableRules.Count, Mode=OneWay}"
-                                                   Opacity="0.5"
-                                                   Margin="0,0,16,0"
-                                                   VerticalAlignment="Center"/>
-
-                                        <Button Grid.Column="2" 
+                                        <Button Grid.Column="1" 
                                                 Content="&#xE74D;" 
                                                 FontFamily="{ThemeResource SymbolThemeFontFamily}"
                                                 Background="Transparent"
@@ -116,7 +110,13 @@
                                                 CommandParameter="{Binding}"
                                                 Visibility="{x:Bind helpers:ProfileUIHelper.HideIfSystem(IsSystem), Mode=OneWay}"
                                                 ToolTipService.ToolTip="Удалить профиль"
+                                                Margin="0,0,16,0"
                                                 VerticalAlignment="Center"/>
+
+                                        <TextBlock Grid.Column="2"
+                                                   Text="{x:Bind ObservableRules.Count, Mode=OneWay}"
+                                                   Opacity="0.5"
+                                                   VerticalAlignment="Center"/>
                                     </Grid>
                                 </Expander.Header>
 
