@@ -92,7 +92,6 @@
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
 
                                         <TextBlock Grid.Column="0" 
@@ -101,21 +100,13 @@
                                                    FontSize="15" 
                                                    VerticalAlignment="Center"/>
 
-                                        <CheckBox Grid.Column="1" 
-                                                  Content="Глобально" 
-                                                  IsChecked="{x:Bind IsGlobalMode, Mode=TwoWay}" 
-                                                  Visibility="{x:Bind helpers:ProfileUIHelper.HideIfSystem(IsSystem), Mode=OneWay}"
-                                                  IsEnabled="{Binding IsSystem, Converter={StaticResource BoolNegationConverter}}"
-                                                  Margin="0,0,12,0" 
-                                                  VerticalAlignment="Center"/>
-
-                                        <TextBlock Grid.Column="2"
+                                        <TextBlock Grid.Column="1"
                                                    Text="{x:Bind ObservableRules.Count, Mode=OneWay}"
                                                    Opacity="0.5"
                                                    Margin="0,0,16,0"
                                                    VerticalAlignment="Center"/>
 
-                                        <Button Grid.Column="3" 
+                                        <Button Grid.Column="2" 
                                                 Content="&#xE74D;" 
                                                 FontFamily="{ThemeResource SymbolThemeFontFamily}"
                                                 Background="Transparent"
@@ -131,11 +122,25 @@
 
                                 <Expander.Content>
                                     <StackPanel Spacing="8">
-                                        <Button Content="+ Добавить папку в профиль" 
-                                                HorizontalAlignment="Stretch"
-                                                Visibility="{x:Bind helpers:ProfileUIHelper.HideIfSystem(IsSystem), Mode=OneWay}"
-                                                Command="{Binding DataContext.AddFolderToProfileCommand, ElementName=ProfilesList}" 
-                                                CommandParameter="{Binding}"/>
+                                        <Grid ColumnSpacing="12" 
+                                              Visibility="{x:Bind helpers:ProfileUIHelper.HideIfSystem(IsSystem), Mode=OneWay}">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <Button Grid.Column="0"
+                                                    Content="+ Добавить папку в профиль" 
+                                                    HorizontalAlignment="Stretch"
+                                                    Command="{Binding DataContext.AddFolderToProfileCommand, ElementName=ProfilesList}" 
+                                                    CommandParameter="{Binding}"/>
+
+                                            <CheckBox Grid.Column="1"
+                                                      Content="Глобально" 
+                                                      IsChecked="{x:Bind IsGlobalMode, Mode=TwoWay}" 
+                                                      IsEnabled="{Binding IsSystem, Converter={StaticResource BoolNegationConverter}}"
+                                                      VerticalAlignment="Center"/>
+                                        </Grid>
 
                                         <ItemsControl ItemsSource="{x:Bind ObservableRules, Mode=OneWay}">
                                             <ItemsControl.ItemTemplate>
