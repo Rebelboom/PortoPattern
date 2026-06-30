@@ -1,0 +1,368 @@
+FILE: .\AdminRequirementConverter.cs
+----------------------------------------
+// Файл: AdminRequirementConverter.cs
+// Расположение: UI Проект -> Папка Converters (Глобальная регистрация в App.xaml)
+// Описание: Конвертер для WinUI 3 XAML. Отвечает за динамическое управление свойством IsEnabled 
+// элементов интерфейса в зависимости от типа папки (системная/пользовательская) и прав администратора текущего процесса.
+
+#nullable enable
+using System;
+using Microsoft.UI.Xaml.Data;
+using PortoPattern.Core.IgnorNew;
+
+namespace PortoPattern.Converters;
+
+public class AdminRequirementConverter : IValueConverter
+{
+    // ==========================================
+    // Блок 1: Логика конвертации (Model -> UI)
+    // ==========================================
+
+    public object Convert(object value, Type targetType, object parameter, string language)
+    {
+        if (value is bool isSystemFolder)
+        {
+            // Чекбокс активен, если папка НЕ является системной
+            // ИЛИ если папка системная, но у текущего пользователя есть права администратора.
+            return !isSystemFolder || IgnoreItem.IsUserAdministrator();
+        }
+
+        // В случае непредвиденных типов данных блокируем элемент в целях безопасности
+        return false;
+    }
+
+    // ==========================================
+    // Блок 2: Обратная конвертация (UI -> Model)
+    // ==========================================
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    {
+        // Изменение состояния IsEnabled в UI не должно менять исходные данные модели.
+        throw new NotImplementedException();
+    }
+}
+
+========================================
+
+FILE: .\BoolNegationConverter.cs
+----------------------------------------
+using Microsoft.UI.Xaml.Data;
+using System;
+
+namespace PortoPattern.Converters;
+
+public class BoolNegationConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, string language)
+    {
+        if (value is bool b)
+            return !b;
+
+        return false;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    {
+        if (value is bool b)
+            return !b;
+
+        return false;
+    }
+}
+
+========================================
+
+FILE: .\BoolToVisibilityConverter.cs
+----------------------------------------
+// ****************************************************************************
+// Файл: BoolToVisibilityConverter.cs
+// Описание: Универсальный конвертер логических состояний в видимость WinUI.
+//
+// НАЗНАЧЕНИЕ:
+// - Преобразование true -> Visible, false -> Collapsed.
+// - Поддержка инверсии логики через передачу любого строкового параметра 
+//   в ConverterParameter (например, ConverterParameter=Invert).
+// ****************************************************************************
+
+#nullable enable
+
+using System;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Data;
+
+namespace PortoPattern.Converters;
+
+/// <summary>
+/// Конвертирует логическое значение в перечисление Visibility.
+/// </summary>
+public class BoolToVisibilityConverter : IValueConverter
+{
+    // =========================================================================
+    // ЛОГИКА ПРЕОБРАЗОВАНИЯ (Convert)
+    // =========================================================================
+
+    public object Convert(object value, Type targetType, object parameter, string language)
+    {
+        if (value is bool b)
+        {
+            // Если в XAML задан параметр, инвертируем результат
+            bool invert = parameter != null;
+            if (invert) return b ? Visibility.Collapsed : Visibility.Visible;
+
+            return b ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        return Visibility.Collapsed;
+    }
+
+    // =========================================================================
+    // ОБРАТНОЕ ПРЕОБРАЗОВАНИЕ (ConvertBack)
+    // =========================================================================
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    {
+        if (value is Visibility vis)
+        {
+            return vis == Visibility.Visible;
+        }
+        return false;
+    }
+}
+
+========================================
+
+FILE: .\BoolToVisibilityInverseConverter.cs
+----------------------------------------
+// ****************************************************************************
+// Файл: BoolToVisibilityInverseConverter.cs
+// Описание: Инвертированный логический конвертер.
+//
+// ПРИМЕНЕНИЕ:
+// - true -> Collapsed (скрыть, если условие выполнено).
+// - false -> Visible (показать, если условие не выполнено).
+// Идеален для элементов-заглушек и сообщений об отсутствии данных.
+// ****************************************************************************
+
+#nullable enable
+
+using System;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Data;
+
+namespace PortoPattern.Converters;
+
+/// <summary>
+/// Скрывает элемент, если логическое значение истинно.
+/// </summary>
+public class BoolToVisibilityInverseConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, string language)
+    {
+        if (value is bool b)
+        {
+            return b ? Visibility.Collapsed : Visibility.Visible;
+        }
+        return Visibility.Visible;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    {
+        if (value is Visibility vis)
+        {
+            return vis != Visibility.Visible;
+        }
+        return true;
+    }
+}
+
+========================================
+
+FILE: .\ConvertProfileName.cs
+----------------------------------------
+using System;
+using Microsoft.UI.Xaml.Data;
+using System.IO;
+
+namespace PortoPattern.Converters
+{
+    public class ConvertProfileName : IValueConverter
+    {
+        public object Convert(object? value, Type targetType, object? parameter, string language)
+        {
+            if (value == null) return string.Empty;
+
+            string path = value.ToString() ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(path)) return string.Empty;
+
+            try
+            {
+                // Извлекаем только имя файла/папки из полного пути
+                return Path.GetFileName(path.TrimEnd('\\', '/')) ?? path;
+            }
+            catch
+            {
+                return path;
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new NotImplementedException();
+        }
+    }
+}
+
+========================================
+
+FILE: .\ConvertRuleToTooltip.cs
+----------------------------------------
+using System;
+using System.IO;
+using Microsoft.UI.Xaml.Data;
+using PortoPattern.Core.IgnorSpace;
+
+namespace PortoPattern.Converters
+{
+    // Конвертер для создания всплывающей подсказки (ToolTip) на основе режима правила фильтрации.
+    public class ConvertRuleToTooltip : IValueConverter
+    {
+        // Преобразует объект IgnorRule в строку для ToolTip в зависимости от значения свойства Mode.
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            if (value is IgnorRule rule)
+            {
+                try
+                {
+                    // Проверяем режим правила для формирования текста подсказки.
+                    // Логика применяется только для пользовательских профилей, 
+                    // но проверка внутри конвертера гарантирует безопасность.
+                    if (rule.Mode.ToString() == "GlobalName")
+                    {
+                        // В глобальном режиме извлекаем только имя конечной папки.
+                        string folderName = Path.GetFileName(rule.RealPath.TrimEnd('\\', '/')) ?? rule.RealPath;
+                        return $"все директории {folderName}";
+                    }
+                    else if (rule.Mode.ToString() == "ExactPath")
+                    {
+                        // В режиме точного пути возвращаем полный маршрут.
+                        return $"полный путь {rule.RealPath}";
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Ошибки выводим в консоль только при отладке, чтобы не ломать релизную версию.
+#if DEBUG
+                    Console.WriteLine($"Ошибка в ConvertRuleToTooltip: {ex.Message}");
+#endif
+                    // В случае непредвиденного сбоя возвращаем оригинальный путь как страховку.
+                    return rule.RealPath ?? string.Empty;
+                }
+            }
+
+            // Возвращаем пустую строку, если значение null или тип не совпадает.
+            return string.Empty;
+        }
+
+        // Обратное преобразование не требуется для ToolTip (работает только OneWay).
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new NotImplementedException();
+        }
+    }
+}
+
+========================================
+
+FILE: .\InverseNullToVisibilityConverter.cs
+----------------------------------------
+// ****************************************************************************
+// Файл: InverseNullToVisibilityConverter.cs
+// Описание: Инвертированный детектор наличия данных.
+//
+// НАЗНАЧЕНИЕ:
+// - null -> Visible (показать состояние ожидания или пустоты).
+// - not null -> Collapsed (скрыть, когда данные загружены).
+// ****************************************************************************
+
+#nullable enable
+
+using System;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Data;
+
+namespace PortoPattern.Converters;
+
+/// <summary>
+/// Отображает элемент только в том случае, если привязанное значение отсутствует.
+/// </summary>
+public sealed class InverseNullToVisibilityConverter : IValueConverter
+{
+    public object Convert(object? value, Type targetType, object? parameter, string language)
+    {
+        // Если объекта нет — показываем элемент (заглушку)
+        return value == null ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    {
+        throw new NotSupportedException("InverseNullToVisibilityConverter: ConvertBack не поддерживается.");
+    }
+}
+
+========================================
+
+FILE: .\NullToVisibilityConverter.cs
+----------------------------------------
+// ****************************************************************************
+// Файл: NullToVisibilityConverter.cs
+// Описание: Конвертер состояний наличия данных (Presence Converter).
+//
+// НАЗНАЧЕНИЕ:
+// - null -> Collapsed (скрыть пустой блок).
+// - not null -> Visible (отобразить данные).
+// - Поддержка гибкой инверсии через ConverterParameter.
+// ****************************************************************************
+
+#nullable enable
+
+using System;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Data;
+
+namespace PortoPattern.Converters;
+
+/// <summary>
+/// Управляет видимостью элемента в зависимости от наличия привязанного объекта.
+/// </summary>
+public sealed class NullToVisibilityConverter : IValueConverter
+{
+    // =========================================================================
+    // ОСНОВНАЯ ЛОГИКА
+    // =========================================================================
+
+    public object Convert(object? value, Type targetType, object? parameter, string language)
+    {
+        bool invert = parameter != null;
+        bool isNull = value == null;
+
+        if (invert)
+        {
+            // Показать, если данных НЕТ
+            return isNull ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        // Показать, если данные ЕСТЬ
+        return isNull ? Visibility.Collapsed : Visibility.Visible;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    {
+        // Обратная конвертация из состояния видимости в абстрактный объект невозможна.
+        throw new NotSupportedException("NullToVisibilityConverter: ConvertBack не поддерживается.");
+    }
+
+    // TODO: В будущем добавить проверку на пустые строки или коллекции (IEnumerable.Any).
+}
+
+========================================
+
