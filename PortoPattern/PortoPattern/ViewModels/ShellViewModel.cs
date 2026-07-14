@@ -8,6 +8,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.UI.Xaml.Controls;
 using PortoPattern.Messages;
 using PortoPattern.Navigation.Interfaces;
+using PortoPattern.Services.Dialogs;
 
 namespace PortoPattern.ViewModels;
 
@@ -22,6 +23,7 @@ public partial class ShellViewModel : MainViewModel,
     #region Fields
 
     private readonly INavigationService _navigation;
+    private readonly IDialogService _dialogService;
 
     #endregion
 
@@ -37,9 +39,12 @@ public partial class ShellViewModel : MainViewModel,
 
     #region Constructor
 
-    public ShellViewModel(INavigationService navigation)
+    public ShellViewModel(
+        INavigationService navigation,
+        IDialogService dialogService)
     {
         _navigation = navigation ?? throw new ArgumentNullException(nameof(navigation));
+        _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
 
         // NOTE: Shell subscribes to global navigation events
         WeakReferenceMessenger.Default.Register<NavigationMessage>(this);
@@ -86,6 +91,14 @@ public partial class ShellViewModel : MainViewModel,
 
         if (args.InvokedItemContainer?.Tag is not string tag)
             return;
+
+        // NOTE: Shell-level dialogs are opened here.
+        // About is not a page and must not go through navigation.
+        if (tag == "About")
+        {
+            await _dialogService.ShowDialogAsync<AboutDialogViewModel>();
+            return;
+        }
 
         var targetType = ResolveViewModel(tag);
         if (targetType is null)

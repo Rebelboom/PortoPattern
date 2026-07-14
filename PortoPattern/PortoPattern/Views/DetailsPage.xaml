@@ -2,9 +2,10 @@
 <!-- ****************************************************************************
 // Файл: DetailsPage.xaml
 // Описание: Страница детального просмотра категории.
-// Отображает список папок, используя кастомный контрол FolderCard.
+// Отображает список папок в виде стилизованных вытянутых карточек с тенью.
 // **************************************************************************** -->
 <Page
+    x:Name="PageRoot"
     x:Class="PortoPattern.Views.DetailsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -15,33 +16,53 @@
     mc:Ignorable="d"
     Background="Transparent">
 
-    <!-- Левый и нижний отступы страницы -->
     <Grid Padding="24,24,0,24">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
+            <!-- Изменено на фиксированную высоту 100, чтобы соответствовать дизайну страницы результатов -->
+            <RowDefinition Height="100"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- ЗАГОЛОВОК КАТЕГОРИИ -->
-        <TextBlock 
+        <!-- Интегрирован TopToolBar вместо обычного TextBlock. Связываем с Header и SearchText -->
+        <controls:TopToolBar
             Grid.Row="0"
-            Text="{x:Bind ViewModel.Header, Mode=OneWay}" 
-            Style="{ThemeResource SubtitleTextBlockStyle}" 
-            Margin="0,0,0,20"/>
+            Title="{x:Bind ViewModel.Header, Mode=OneWay}"
+            SearchText="{x:Bind ViewModel.SearchText, Mode=TwoWay}"/>
 
-        <!-- СПИСОК ГРУПП (ПАПОК) -->
-        <!-- Добавлен Padding справа (24), чтобы карточки не упирались в скроллбар -->
         <ScrollViewer Grid.Row="1" 
                       VerticalScrollBarVisibility="Auto" 
                       Padding="0,0,24,0">
-            <ItemsControl ItemsSource="{x:Bind ViewModel.Folders, Mode=OneWay}">
+
+            <!-- Источник данных изменен с Folders на FilteredFolders для поддержки поиска -->
+            <ItemsControl ItemsSource="{x:Bind ViewModel.FilteredFolders, Mode=OneWay}">
+
+                <!-- Используем StackPanel с отступом Spacing="16", чтобы раздвинуть карточки -->
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Vertical" Spacing="16"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
                 <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="vm:FolderCardViewModel">
-                        <!-- Передаем вью-модель папки напрямую в DataContext карточки -->
-                        <controls:FolderCard Margin="0,0,0,12"/>
+
+                        <!-- Добавлен атрибут SearchText с привязкой через ElementName к корневой странице -->
+                        <controls:FolderCard 
+                                SearchText="{Binding ViewModel.SearchText, ElementName=PageRoot}"
+                                HorizontalAlignment="Stretch"
+                                Background="{ThemeResource Porto.Element.Default}"
+                                BorderBrush="{ThemeResource Porto.Border.Default}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Foreground="{ThemeResource Porto.Text.Default}"
+                                PointerOverBackgroundCustom="{ThemeResource Porto.Element.Hover}"
+                                PointerOverBorderBrushCustom="{ThemeResource Porto.Border.Hover}"
+                                PointerOverForegroundCustom="{ThemeResource Porto.Text.Hover}"/>
+
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
+
         </ScrollViewer>
     </Grid>
 </Page>

@@ -9,6 +9,8 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using PortoPattern.Interfaces;
 using PortoPattern.Services;
+using PortoPattern.Services.Dialogs;
+using PortoPattern.Dialogs;
 using PortoPattern.Navigation;
 using PortoPattern.Navigation.Interfaces;
 using PortoPattern.Navigation.Services;
@@ -36,7 +38,19 @@ public static class UiRegistration
         services.AddSingleton<IFilePickerService, FilePickerService>();
 
         // =========================================================
-        // БЛОК 3: VIEWMODELS (Основные страницы)
+        // БЛОК 3: DIALOG SYSTEM
+        // =========================================================
+        services.AddSingleton<DialogQueue>();
+        services.AddSingleton<IDialogFactory, DialogFactory>();
+        services.AddSingleton<IDialogService, DialogService>();
+
+        services.AddTransient<AboutDialog>();
+        services.AddTransient<AboutDialogViewModel>();
+        services.AddTransient<TestDialog>();
+        services.AddTransient<TestDialogViewModel>();
+
+        // =========================================================
+        // БЛОК 4: VIEWMODELS (Основные страницы)
         // Примечание: FolderCardViewModel НЕ регистрируется, так как 
         // создается динамически в DetailsViewModel.
         // =========================================================
@@ -49,7 +63,7 @@ public static class UiRegistration
         services.AddTransient<BlackListViewModel>();
 
         // =========================================================
-        // БЛОК 4: PAGES (Представления)
+        // БЛОК 5: PAGES (Представления)
         // =========================================================
         services.AddTransient<ShellPage>();
         services.AddTransient<HomePage>();

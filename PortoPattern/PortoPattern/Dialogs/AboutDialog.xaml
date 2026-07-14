@@ -52,11 +52,12 @@
                     FontSize="{StaticResource FontSizeHuge}"
                     Foreground="{StaticResource SecondaryBrush}"
                     Text="About&#x0020;" />
+                <!-- NOTE: Привязка изменена на свойство ViewModel -->
                 <TextBlock
                     x:Name="tbTitle"
                     FontSize="{StaticResource FontSizeHuge}"
                     Foreground="{StaticResource SecondaryBrush}"
-                    Text="{x:Bind root:AppConfig.AppName}" />
+                    Text="{x:Bind ViewModel.AppName, Mode=OneWay}" />
             </StackPanel>
             <Image
                 x:Name="imgLevel"
@@ -78,28 +79,31 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
+        <!-- NOTE: Привязка изменена на свойство ViewModel -->
         <TextBlock
             Grid.Row="0"
             Margin="20,10,20,5"
             FontSize="{StaticResource FontSizeMedium}"
             Foreground="{StaticResource PrimaryBrush}"
-            Text="{x:Bind root:AppConfig.Author}"
+            Text="{x:Bind ViewModel.Author, Mode=OneWay}"
             TextWrapping="Wrap" />
 
+        <!-- NOTE: Привязка изменена на свойство ViewModel -->
         <TextBlock
             Grid.Row="1"
             Margin="20,5,20,5"
             FontSize="{StaticResource FontSizeMedium}"
             Foreground="{StaticResource PrimaryBrush}"
-            Text="{x:Bind root:AppConfig.Description}"
+            Text="{x:Bind ViewModel.Description, Mode=OneWay}"
             TextWrapping="Wrap" />
 
+        <!-- NOTE: Привязка изменена на свойство ViewModel -->
         <TextBlock
             Grid.Row="2"
             Margin="20,5,20,5"
             FontSize="{StaticResource FontSizeMedium}"
             Foreground="{StaticResource PrimaryBrush}"
-            Text="{x:Bind root:AppConfig.EnvironmentNote}"
+            Text="{x:Bind ViewModel.EnvironmentNote, Mode=OneWay}"
             TextWrapping="Wrap" />
 
         <StackPanel
@@ -112,10 +116,11 @@
                 Foreground="{StaticResource SecondaryBrush}"
                 Text="Architecture &amp; Contacts:" />
             <ScrollViewer Height="40">
+                <!-- NOTE: Привязка изменена на свойство ViewModel -->
                 <TextBlock
                     FontSize="{StaticResource FontSizeMedium}"
                     Foreground="DarkBlue"
-                    Text="{x:Bind root:AppConfig.ContactInfo}" />
+                    Text="{x:Bind ViewModel.ContactInfo, Mode=OneWay}" />
             </ScrollViewer>
         </StackPanel>
 
@@ -159,18 +164,20 @@
                 Foreground="{StaticResource SecondaryBrush}"
                 Text="Application version: "
                 TextWrapping="NoWrap" />
+            <!-- NOTE: Привязка изменена на свойство ViewModel -->
             <TextBlock
                 VerticalAlignment="Center"
                 FontSize="{StaticResource FontSizeMedium}"
                 Foreground="{StaticResource SecondaryBrush}"
-                Text="{x:Bind root:AppConfig.AppVersion}"
+                Text="{x:Bind ViewModel.AppVersion, Mode=OneWay}"
                 TextWrapping="NoWrap" />
+            <!-- NOTE: Привязка изменена на свойство ViewModel -->
             <TextBlock
                 VerticalAlignment="Center"
                 Margin="5,0,0,0"
                 FontSize="{StaticResource FontSizeMedium}"
                 Foreground="DarkBlue"
-                Text="{x:Bind root:AppConfig.Architecture}"
+                Text="{x:Bind ViewModel.Architecture, Mode=OneWay}"
                 TextWrapping="NoWrap" />
         </StackPanel>
     </Grid>

@@ -105,6 +105,9 @@
                 </local:ToolTipFade>
             </ToolTipService.ToolTip>
         </Button>
+        <Button Content="Проверить диалог" 
+                Command="{Binding TestDialogCommand}" 
+                Width="250" Height="50" />
 
 
     </StackPanel>

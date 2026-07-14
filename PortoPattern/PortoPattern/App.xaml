@@ -41,6 +41,7 @@
             <Converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
             <Converters:InverseNullToVisibilityConverter x:Key="InverseNullToVisibilityConverter"/>
             <Converters:AdminRequirementConverter x:Key="AdminRequirementConverter" />
+            <Converters:AdminRequiredVisibilityConverter x:Key="AdminRequiredVisibilityConverter" />
             <Converters:BoolNegationConverter x:Key="BoolNegationConverter"/>
             <Converters:ConvertProfileName x:Key="ProfileNameConverter"/>
             <Converters:ConvertRuleToTooltip x:Key="RuleTooltipConverter"/>

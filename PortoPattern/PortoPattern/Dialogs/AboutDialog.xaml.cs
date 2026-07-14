@@ -4,17 +4,24 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using PortoPattern.Helpers;
+using PortoPattern.ViewModels;
 using System;
 
 namespace PortoPattern.Dialogs;
 
 public sealed partial class AboutDialog : ContentDialog
 {
+    // NOTE: Строго типизированное свойство для работы x:Bind в XAML
+    public AboutDialogViewModel? ViewModel => DataContext as AboutDialogViewModel;
+
     public AboutDialog()
     {
         try
         {
             this.InitializeComponent();
+
+            // NOTE: Обновляем привязки, когда DialogFactory устанавливает DataContext
+            this.DataContextChanged += (s, e) => Bindings.Update();
 
             this.Loaded += AboutDialogOnLoaded;
             this.Unloaded += AboutDialogOnUnloaded;

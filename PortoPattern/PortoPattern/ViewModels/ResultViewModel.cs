@@ -44,8 +44,6 @@ public partial class ResultViewModel : SearchableViewModel<FileCategory>
             AllItems = results;
 
             ResetFilter();
-
-            // TODO: Raise property change for CategoriesSubtitle if UI does not auto-refresh
         }
     }
 
@@ -55,6 +53,16 @@ public partial class ResultViewModel : SearchableViewModel<FileCategory>
 
     protected override bool FilterPredicate(FileCategory item, string query)
         => item.Extension?.Contains(query, StringComparison.OrdinalIgnoreCase) == true;
+
+    // ==========================================================
+    // CategoriesSubtitle вычисляется из FilteredItems.Count.
+    // После каждого изменения фильтра уведомляем интерфейс,
+    // что вычисляемое свойство изменилось.
+    // ==========================================================
+    protected override void OnFilteredItemsChanged()
+    {
+        OnPropertyChanged(nameof(CategoriesSubtitle));
+    }
 
     #endregion
 
@@ -71,9 +79,6 @@ public partial class ResultViewModel : SearchableViewModel<FileCategory>
     #endregion
 
     #region Notes / TODO
-
-    // NOTE: CategoriesSubtitle is not observable; UI may not update automatically
-    // TODO: Consider converting to ObservableProperty or computed reactive property
 
     // NOTE: AllItems is mutable in base class; consider IReadOnlyList for safety
 

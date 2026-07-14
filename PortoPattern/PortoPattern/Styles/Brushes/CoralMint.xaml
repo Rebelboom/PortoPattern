@@ -81,6 +81,22 @@
         <!-- Ржаво-терракотовый -->
     </LinearGradientBrush>
 
+    <!-- 
+// Реверсивный градиент для состояния наведения (PointerOver)
+// Цвета инвертированы по осям (1.0 -> 0.0, 0.5 -> 0.5, 0.2 -> 0.8, 0.0 -> 1.0)
+// для создания эффекта "наизнанку" при сохранении направления заливки.
+-->
+    <LinearGradientBrush x:Key="GradientButtonReversBrush" StartPoint="0,0" EndPoint="0,1">
+        <!-- Ржаво-терракотовый (бывший 1.0) -->
+        <GradientStop Offset="0.0" Color="#9A3412" />
+        <!-- Насыщенный коралловый (остается по центру) -->
+        <GradientStop Offset="0.5" Color="#EA580C" />
+        <!-- Яркий оранжевый (бывший 0.2, теперь 1.0 - 0.2 = 0.8) -->
+        <GradientStop Offset="0.8" Color="#FB923C" />
+        <!-- Светлый персик (бывший 0.0) -->
+        <GradientStop Offset="1.0" Color="#FFEDD5" />
+    </LinearGradientBrush>
+
     <!-- Кнопка: Наведение мыши (Более яркое свечение верхушки) -->
     <LinearGradientBrush x:Key="GradientButtonPointerOverBrush" StartPoint="0,0" EndPoint="0,1">
         <GradientStop Offset="0.0" Color="#FFF7ED" />

@@ -1,10 +1,11 @@
 #nullable enable
+
 using System.ComponentModel;
 using System.Linq;
-using System;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using PortoPattern.Navigation.Interfaces;
-using PortoPattern.Dialogs;
+using PortoPattern.Services.Dialogs;
 using PortoPattern.ViewModels;
 
 namespace PortoPattern.Views;
@@ -13,16 +14,33 @@ public sealed partial class ShellPage : Page
 {
     public ShellViewModel ViewModel { get; }
 
-    public ShellPage(ShellViewModel viewModel, INavigationService navigationService)
+    private readonly IDialogService _dialogService;
+
+    public ShellPage(
+        ShellViewModel viewModel,
+        INavigationService navigationService,
+        IDialogService dialogService)
     {
         ViewModel = viewModel;
+        _dialogService = dialogService;
+
         DataContext = viewModel;
         InitializeComponent();
 
         navigationService.Initialize(ContentFrame);
 
         ViewModel.PropertyChanged += ViewModel_PropertyChanged;
-        Loaded += (s, e) => _ = ViewModel.InitializeAsync();
+        Loaded += ShellPage_Loaded;
+    }
+
+    private void ShellPage_Loaded(object sender, RoutedEventArgs e)
+    {
+        if (XamlRoot != null)
+        {
+            _dialogService.SetXamlRoot(XamlRoot);
+        }
+
+        _ = ViewModel.InitializeAsync();
     }
 
     private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -46,21 +64,12 @@ public sealed partial class ShellPage : Page
             .OfType<NavigationViewItem>()
             .FirstOrDefault(x => x.Tag?.ToString() == tag);
 
-        if (item != null) RootNavigation.SelectedItem = item;
+        if (item != null)
+            RootNavigation.SelectedItem = item;
     }
 
-    private async void OnItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
+    private void OnItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
     {
-        if (args.InvokedItemContainer?.Tag?.ToString() == "About")
-        {
-            AboutDialog dialog = new AboutDialog();
-
-            await DialogHelper.ShowAsync(dialog, RootNavigation);
-
-            SyncSelection(ViewModel.ActiveTag);
-            return;
-        }
-
         ViewModel.NavigateCommand.Execute(args);
     }
 

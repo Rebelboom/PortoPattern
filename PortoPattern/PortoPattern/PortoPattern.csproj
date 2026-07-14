@@ -32,6 +32,7 @@
     <None Remove="Controls\HighlightTextBlock.xaml" />
     <None Remove="Controls\TopToolBar.xaml" />
     <None Remove="Dialogs\MatchPolicyDialog.xaml" />
+    <None Remove="Dialogs\TestDialog.xaml" />
     <None Remove="Styles\Brushes\CoralMint.xaml" />
     <None Remove="Styles\Brushes\Default.xaml" />
     <None Remove="Styles\Styles.xaml" />
@@ -119,6 +120,12 @@
 	  <Content Update="Assets\Spinner3.png">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Page Update="Dialogs\TestDialog.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	</ItemGroup>
 
 	<ItemGroup>

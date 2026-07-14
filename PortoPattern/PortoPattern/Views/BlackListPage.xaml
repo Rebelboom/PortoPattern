@@ -162,7 +162,7 @@
                                                                       Margin="0"/>
 
                                                             <Border Background="Transparent"
-                                                                    Visibility="{Binding IsEnabled, ElementName=RuleCheckBox, Converter={StaticResource BooleanVisibilityInverse}}">
+                                                                    Visibility="{Binding RequiresAdmin, Converter={StaticResource AdminRequiredVisibilityConverter}}">
                                                                 <ToolTipService.ToolTip>
                                                                     <global:ToolTipFade FadeTime="500">
                                                                         <Border Background="#FF333333" Padding="15" CornerRadius="10">

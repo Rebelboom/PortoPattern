@@ -6,10 +6,11 @@
 
 #nullable enable
 
+using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using CommunityToolkit.Mvvm.ComponentModel;
 using PortoPattern.Core.Models;
 using PortoPattern.Navigation.Interfaces;
 
@@ -23,16 +24,89 @@ public partial class DetailsViewModel : NavigableViewModel
 {
     #region Properties
 
-    [ObservableProperty]
-    public partial string Header { get; set; } = "Список файлов";
+    /// <summary>
+    /// Dynamic header showing current filtered file count.
+    /// </summary>
+    public string Header =>
+        $"Список файлов ({FilteredFileCount})";
+
 
     /// <summary>
     /// UI collection of folder card ViewModels.
-    /// NOTE: Mutated on navigation event; assumed UI-thread affinity.
     /// </summary>
     public ObservableCollection<FolderCardViewModel> Folders { get; } = new();
 
+
+    private string _searchText = string.Empty;
+
+
+    /// <summary>
+    /// Search text from TopToolBar.
+    /// </summary>
+    public string SearchText
+    {
+        get => _searchText;
+        set
+        {
+            if (SetProperty(ref _searchText, value))
+            {
+                OnPropertyChanged(nameof(FilteredFolders));
+                OnFilteredFoldersChanged();
+            }
+        }
+    }
+
+
+    /// <summary>
+    /// Filtered folders shown in UI.
+    /// Searches by folder name and file names.
+    /// </summary>
+    public ObservableCollection<FolderCardViewModel> FilteredFolders
+    {
+        get
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(SearchText))
+                {
+                    return Folders;
+                }
+
+
+                var filtered = Folders.Where(f =>
+                    (f.FolderName != null &&
+                     f.FolderName.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
+
+                    ||
+
+                    (f.FileListDisplay != null &&
+                     f.FileListDisplay.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
+                );
+
+
+                return new ObservableCollection<FolderCardViewModel>(filtered);
+            }
+            catch (Exception ex)
+            {
+#if DEBUG
+                System.Diagnostics.Debug.WriteLine(
+                    $"[DEBUG ERROR] Filtering DetailsViewModel failed: {ex.Message}");
+#endif
+                return Folders;
+            }
+        }
+    }
+
+
+    /// <summary>
+    /// Current number of files after filtering.
+    /// </summary>
+    public int FilteredFileCount =>
+        FilteredFolders.Sum(f => f.Files.Count);
+
+
     #endregion
+
 
     #region Constructor
 
@@ -43,43 +117,93 @@ public partial class DetailsViewModel : NavigableViewModel
 
     #endregion
 
+
     #region Navigation lifecycle
 
     public override Task OnNavigatedToAsync(object? parameter, CancellationToken ct)
     {
-        // NOTE: Avoid duplicate population on re-navigation without reset
         if (parameter is FileCategory category)
         {
-            Header = $"Категория: {category.Extension.ToUpperInvariant()} ({category.TotalFileCount})";
-
             Folders.Clear();
+
 
             foreach (var group in category.FolderGroups)
             {
-                // NOTE: Projection layer from domain model to UI VM
-                Folders.Add(new FolderCardViewModel(
+                var folderName = ResolveFolderName(
                     group.FolderName,
+                    group.FullPath);
+
+
+                Folders.Add(new FolderCardViewModel(
+                    folderName,
                     group.FullPath,
                     group.Files));
             }
+
+
+            OnPropertyChanged(nameof(FilteredFolders));
+            OnFilteredFoldersChanged();
         }
 
-        // NOTE: Base implementation may trigger messaging + CTS setup
+
         return base.OnNavigatedToAsync(parameter, ct);
     }
 
     #endregion
 
-    #region Notes / TODO
 
-    // NOTE: ObservableCollection assumes UI-thread affinity.
-    // TODO: Ensure navigation always occurs on UI thread or introduce dispatcher abstraction.
+    #region Folder name resolving
 
-    // NOTE: Re-navigation will re-clear and rebuild entire collection (no diffing).
-    // TODO: Consider incremental updates or immutable snapshot swap for large datasets.
+    /// <summary>
+    /// Resolves display name for folders.
+    /// Root drive folders do not have a normal folder name,
+    /// so they are displayed as "Диск C:" instead of empty text.
+    /// </summary>
+    private static string ResolveFolderName(
+        string? folderName,
+        string? fullPath)
+    {
+        if (!string.IsNullOrWhiteSpace(folderName))
+        {
+            return folderName;
+        }
 
-    // NOTE: Mapping from domain model to ViewModel currently done inline.
-    // TODO: Consider introducing mapper layer (IModelMapper<FileCategory, DetailsVMState>).
+
+        if (!string.IsNullOrWhiteSpace(fullPath))
+        {
+            var path = fullPath.TrimEnd('\\');
+
+
+            if (path.Length == 2 && path[1] == ':')
+            {
+                return $"Диск {path}";
+            }
+
+
+            return path;
+        }
+
+
+        return "Корневая папка";
+    }
+
+
+    #endregion
+
+
+    #region Filtering notifications
+
+
+    /// <summary>
+    /// Called after FilteredFolders was recalculated.
+    /// Derived classes may override.
+    /// </summary>
+    protected virtual void OnFilteredFoldersChanged()
+    {
+        OnPropertyChanged(nameof(FilteredFileCount));
+        OnPropertyChanged(nameof(Header));
+    }
+
 
     #endregion
 }
