@@ -61,6 +61,7 @@ public static class UiRegistration
         services.AddTransient<DetailsViewModel>();
         services.AddTransient<SettingsViewModel>();
         services.AddTransient<BlackListViewModel>();
+        services.AddTransient<HistoryViewModel>();
 
         // =========================================================
         // БЛОК 5: PAGES (Представления)
@@ -72,6 +73,7 @@ public static class UiRegistration
         services.AddTransient<DetailsPage>();
         services.AddTransient<SettingsPage>();
         services.AddTransient<BlacklistPage>();
+        services.AddTransient<HistoryPage>();
 
         services.AddSingleton<MainWindow>();
 
@@ -89,5 +91,6 @@ public static class UiRegistration
         registry.Register<DetailsViewModel, DetailsPage>();
         registry.Register<SettingsViewModel, SettingsPage>();
         registry.Register<BlackListViewModel, BlacklistPage>();
+        registry.Register<HistoryViewModel, HistoryPage>();
     }
 }

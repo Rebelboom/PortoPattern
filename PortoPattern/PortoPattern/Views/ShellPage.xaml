@@ -20,6 +20,7 @@
         <NavigationView.MenuItems>
             <NavigationViewItem Content="Главная" Tag="Home" Icon="Home" />
             <NavigationViewItem Content="Дашборд" Tag="Dashboard" Icon="Document" />
+            <NavigationViewItem Content="История" Tag="History" Icon="PhoneBook" />
         </NavigationView.MenuItems>
 
         <NavigationView.FooterMenuItems>

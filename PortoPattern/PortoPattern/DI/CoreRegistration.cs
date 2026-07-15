@@ -1,8 +1,9 @@
 ﻿#nullable enable
 using Microsoft.Extensions.DependencyInjection;
+using PortoPattern.Core.History;
+using PortoPattern.Core.IgnorSpace;
 using PortoPattern.Core.Interfaces;
 using PortoPattern.Core.Services;
-using PortoPattern.Core.IgnorSpace;
 
 namespace PortoPattern.DI;
 
@@ -15,6 +16,7 @@ public static class CoreRegistration
         services.AddSingleton<IgnorManager>();
         services.AddSingleton<IgnorRuleGenerator>();
         services.AddSingleton<IgnorFilterService>();
+        services.AddSingleton<IScanHistoryService, ScanHistoryService>();
 
         return services;
     }

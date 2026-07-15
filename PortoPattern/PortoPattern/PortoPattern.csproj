@@ -40,6 +40,7 @@
     <None Remove="Views\AboutDialog.xaml" />
     <None Remove="Views\BlacklistPage.xaml" />
     <None Remove="Views\DetailsPage.xaml" />
+    <None Remove="Views\HistoryPage.xaml" />
     <None Remove="Views\ResultPage.xaml" />
   </ItemGroup>
   <ItemGroup>
@@ -120,6 +121,12 @@
 	  <Content Update="Assets\Spinner3.png">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Page Update="Views\HistoryPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	</ItemGroup>
 
 	<ItemGroup>

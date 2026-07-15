@@ -98,7 +98,8 @@ public partial class HomeViewModel : NavigableViewModel
             "История",
             "Результаты",
             "\uE81C",
-            null));
+            () => WeakReferenceMessenger.Default.Send(
+                new NavigationMessage(typeof(HistoryViewModel)))));
     }
 
     #endregion

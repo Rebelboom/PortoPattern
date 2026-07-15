@@ -1,13 +1,14 @@
-﻿// Файл: FileDiscoveryService.cs
-// Описание: Сервис обхода файловой системы. Модифицирован для работы с 
-// обновленным IgnorFilterService, который автоматически учитывает как пользовательские,
-// так и системные правила из единого источника в IgnorManager.
-
+﻿// ****************************************************************************
+// File: FileDiscoveryService.cs
+// Description: File system traversal service. Records scan statistics into
+//              the IScanHistoryService upon successful completion.
+// ****************************************************************************
 #nullable enable
 using PortoPattern.Core.Interfaces;
 using PortoPattern.Core.Models;
 using PortoPattern.Core.Helpers;
 using PortoPattern.Core.IgnorSpace;
+using PortoPattern.Core.History; // Добавляем пространство имён для истории
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,15 +21,20 @@ namespace PortoPattern.Core.Services;
 public class FileDiscoveryService : IFileDiscoveryService
 {
     private readonly IgnorFilterService _ignorFilter;
+    private readonly IScanHistoryService _scanHistory; // Новый сервис
 
-    public FileDiscoveryService(IgnorFilterService ignorFilter)
+    public FileDiscoveryService(
+        IgnorFilterService ignorFilter,
+        IScanHistoryService scanHistory)
     {
         _ignorFilter = ignorFilter;
+        _scanHistory = scanHistory;
     }
 
     public async Task<List<FileCategory>> GetCategoriesAsync(ScanOptions options, CancellationToken ct)
     {
-        return await Task.Run(() =>
+        // 1. Выполняем основную работу в фоновом потоке
+        var result = await Task.Run(() =>
         {
             var categoryMap = new Dictionary<string, FileCategory>(StringComparer.OrdinalIgnoreCase);
             var categoryGroupMap = new Dictionary<string, Dictionary<string, FolderGroup>>(StringComparer.OrdinalIgnoreCase);
@@ -87,20 +93,34 @@ public class FileDiscoveryService : IFileDiscoveryService
             var comparer = new AlphaNumericComparer();
             return categoryMap.Values.OrderBy(c => c.Extension, comparer).ToList();
         }, ct);
+
+        // 2. Запись в историю после успешного завершения (вне Task.Run)
+        try
+        {
+            await _scanHistory.AddEntryAsync(new ScanHistoryItem
+            {
+                TargetPath = options.RootPath,
+                TotalFiles = result.Sum(x => x.TotalFileCount),
+                CategoriesCount = result.Count
+            });
+        }
+        catch (Exception ex)
+        {
+#if DEBUG
+            System.Diagnostics.Debug.WriteLine($"[DEBUG ERROR] FileDiscoveryService.GetCategoriesAsync - Failed to save history: {ex.Message}");
+#endif
+        }
+
+        return result;
     }
 
-    private IEnumerable<FileInfo> SafeEnumerateFiles(string path, int depth, CancellationToken ct)
-    {
-        return EnumerateDirectory(new DirectoryInfo(path), 0, depth, ct);
-    }
+    // ... методы SafeEnumerateFiles и EnumerateDirectory остаются без изменений ...
+    private IEnumerable<FileInfo> SafeEnumerateFiles(string path, int depth, CancellationToken ct) => EnumerateDirectory(new DirectoryInfo(path), 0, depth, ct);
 
     private IEnumerable<FileInfo> EnumerateDirectory(DirectoryInfo dir, int currentDepth, int maxDepth, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
 
-        // [ПРАВКА]: Метод ShouldIgnore теперь обращается к унифицированному списку правил.
-        // Сюда автоматически попадают папки из системных профилей (если их чекбокс активен),
-        // что исключает необходимость двойных проверок или обращения к кастомным файлам системных папок.
         if (_ignorFilter.ShouldIgnore(dir.FullName))
             yield break;
 
@@ -108,18 +128,12 @@ public class FileDiscoveryService : IFileDiscoveryService
             yield break;
 
         IEnumerable<FileInfo>? files = null;
-        try
-        {
-            files = dir.EnumerateFiles();
-        }
+        try { files = dir.EnumerateFiles(); }
         catch { yield break; }
 
         if (files != null)
         {
-            foreach (var file in files)
-            {
-                yield return file;
-            }
+            foreach (var file in files) yield return file;
         }
 
         if (currentDepth < maxDepth)

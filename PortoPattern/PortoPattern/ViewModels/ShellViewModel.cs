@@ -127,6 +127,7 @@ public partial class ShellViewModel : MainViewModel,
         {
             "Home" => typeof(HomeViewModel),
             "Dashboard" => typeof(DashboardViewModel),
+            "History" => typeof(HistoryViewModel),
             "Settings" => typeof(SettingsViewModel),
             _ => null
         };
@@ -140,6 +141,8 @@ public partial class ShellViewModel : MainViewModel,
             await _navigation.NavigateToAsync<HomeViewModel>();
         else if (viewModelType == typeof(DashboardViewModel))
             await _navigation.NavigateToAsync<DashboardViewModel>();
+        else if (viewModelType == typeof(HistoryViewModel))
+            await _navigation.NavigateToAsync<HistoryViewModel>();
         else if (viewModelType == typeof(SettingsViewModel))
             await _navigation.NavigateToAsync<SettingsViewModel>();
     }
