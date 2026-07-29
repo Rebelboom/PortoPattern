@@ -1,16 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 
-    Файл: Styles.xaml
-    Описание: Главный словарь ресурсов приложения PortoPattern.
--->
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
+    <!-- Подключаем общие ресурсы для всех тем в главный поток -->
     <ResourceDictionary.MergedDictionaries>
-        <!-- Подключение изолированного файла кистей палитры Coral Mint -->
-        <ResourceDictionary Source="ms-appx:///Styles/Brushes/CoralMint.xaml"/>
         <ResourceDictionary Source="ms-appx:///Styles/Brushes/Default.xaml"/>
+        <ResourceDictionary Source="ms-appx:///Styles/Brushes/CoralMint.xaml"/>
     </ResourceDictionary.MergedDictionaries>
+
+    <!-- 
+        Тематические словари с изоляцией внешних файлов через MergedDictionaries 
+        для защиты от сбоев XAML-парсера WinUI 3.
+    -->
+    <ResourceDictionary.ThemeDictionaries>
+
+        <!-- Темная тема -->
+        <ResourceDictionary x:Key="Dark">
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="ms-appx:///Styles/Obsidian/Dark.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+
+        <!-- Светлая тема -->
+        <ResourceDictionary x:Key="Light">
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="ms-appx:///Styles/Obsidian/Light.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+
+    </ResourceDictionary.ThemeDictionaries>
 
 </ResourceDictionary>

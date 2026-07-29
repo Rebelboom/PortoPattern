@@ -35,6 +35,9 @@
     <None Remove="Dialogs\TestDialog.xaml" />
     <None Remove="Styles\Brushes\CoralMint.xaml" />
     <None Remove="Styles\Brushes\Default.xaml" />
+    <None Remove="Styles\Brushes\Obsidian.xaml" />
+    <None Remove="Styles\Obsidian\Dark.xaml" />
+    <None Remove="Styles\Obsidian\Light.xaml" />
     <None Remove="Styles\Styles.xaml" />
     <None Remove="Themes\project_dump.txt" />
     <None Remove="Views\AboutDialog.xaml" />
@@ -45,6 +48,14 @@
   </ItemGroup>
   <ItemGroup>
     <Page Remove="Controls\FolderCard.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Styles\Obsidian\Dark.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Styles\Obsidian\Light.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>
@@ -124,6 +135,24 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Page Update="Styles\Styles.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Page Update="Styles\Obsidain\ObsidianSystem.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Page Update="Styles\Brushes\Obsidian.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	</ItemGroup>
+
+	<ItemGroup>
 	  <Page Update="Views\HistoryPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </Page>
@@ -155,12 +184,6 @@
 
 	<ItemGroup>
 	  <Page Update="Styles\Brushes\Default.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </Page>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Page Update="Styles\Styles.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </Page>
 	</ItemGroup>

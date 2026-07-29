@@ -20,13 +20,16 @@ public partial class HistoryViewModel : NavigableViewModel
 {
     private readonly IScanHistoryService _historyService;
 
-    // Collection exposed to the UI for binding
+    // TODO: [РЕАЛИЗОВАНО] Исправление MVVMTK0045: 
+    // Заменено приватное поле _historyItems на public partial свойство 
+    // для совместимости с Native AOT в WinRT scenarios.
     [ObservableProperty]
-    private ObservableCollection<ScanHistoryItem> _historyItems = new();
+    public partial ObservableCollection<ScanHistoryItem> HistoryItems { get; set; }
 
-    // State flag to control the visibility of the "Empty History" placeholder text
+    // TODO: [РЕАЛИЗОВАНО] Исправление MVVMTK0045: 
+    // Заменено приватное поле _isEmpty на public partial свойство.
     [ObservableProperty]
-    private bool _isEmpty = true;
+    public partial bool IsEmpty { get; set; }
 
     // Constructor injects navigation service (passed to base) and history service
     public HistoryViewModel(
@@ -34,6 +37,11 @@ public partial class HistoryViewModel : NavigableViewModel
         IScanHistoryService historyService) : base(navigationService)
     {
         _historyService = historyService;
+
+        // Инициализация partial свойств вынесена в конструктор, 
+        // так как инициализация напрямую при объявлении свойства недопустима.
+        HistoryItems = new ObservableCollection<ScanHistoryItem>();
+        IsEmpty = true;
     }
 
     // Overrides NavigableViewModel to fetch data when the user navigates here
@@ -59,6 +67,7 @@ public partial class HistoryViewModel : NavigableViewModel
         catch (Exception ex)
         {
 #if DEBUG
+            // Вывод ошибок в консоль только для Debug-сборок
             Console.WriteLine($"[DEBUG ERROR] HistoryViewModel.OnNavigatedToAsync: {ex.Message}");
 #endif
         }

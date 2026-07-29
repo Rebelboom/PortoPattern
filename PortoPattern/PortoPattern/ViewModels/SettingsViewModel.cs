@@ -1,70 +1,71 @@
-﻿#nullable enable
+﻿// ****************************************************************************
+// File: SettingsViewModel.cs
+// Description: ViewModel для страницы настроек. Управляет настройками темы.
+// ****************************************************************************
+
+#nullable enable
 
 using System;
-using System.Threading.Tasks;
-using CommunityToolkit.Mvvm.Input;
 using PortoPattern.Navigation.Interfaces;
-using PortoPattern.Services.Dialogs;
+using PortoPattern.Themes;
+using PortoPattern.Core.Settings;
 
 namespace PortoPattern.ViewModels;
 
-/// <summary>
-/// Settings page ViewModel.
-/// Provides application metadata and inherits navigation lifecycle support.
-/// </summary>
 public partial class SettingsViewModel : NavigableViewModel
 {
-    #region Fields
+    private readonly IThemeService _themeService;
 
-    private string _version = "v1.0.0 (PortoPattern Core)";
+    // ДОБАВЛЕНО: сервис хранения настроек
+    private readonly ISettingsService _settingsService;
 
-    private readonly IDialogService _dialogService;
 
-    #endregion
+    private bool _isDarkMode;
 
-    #region Properties
 
-    public string Version
+    public bool IsDarkMode
     {
-        get => _version;
+        get => _isDarkMode;
 
-        // NOTE: CA1416 suppression removed as no platform-specific API is used here
-        set => SetProperty(ref _version, value);
+        set
+        {
+            if (SetProperty(ref _isDarkMode, value))
+            {
+                // ДОБАВЛЕНО:
+                // Сначала сохраняем выбор пользователя
+                _settingsService.Settings.IsDarkMode = value;
+                _settingsService.Save();
+
+                // Затем применяем тему
+                _themeService.SetTheme(value);
+            }
+        }
     }
 
-    #endregion
-
-    #region Constructor
 
     public SettingsViewModel(
         INavigationService navigation,
-        IDialogService dialogService)
+        IThemeService themeService,
+        ISettingsService settingsService) // ДОБАВЛЕНО
         : base(navigation)
     {
-        _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
+        _themeService = themeService
+            ?? throw new ArgumentNullException(nameof(themeService));
+
+
+        // ДОБАВЛЕНО:
+        // Получаем сервис настроек из DI
+        _settingsService = settingsService
+            ?? throw new ArgumentNullException(nameof(settingsService));
+
+
+        // УДАЛЕНО:
+        // Application.Current.RequestedTheme здесь использовать нельзя.
+        // Он не отражает состояние, которое мы меняем через ThemeService.
+
+
+        // ДОБАВЛЕНО:
+        // Начальное состояние ToggleSwitch берём из сохранённых настроек.
+        _isDarkMode = _settingsService.Settings.IsDarkMode;
     }
-
-    #endregion
-
-    #region Commands
-
-    /// <summary>
-    /// Test command for verifying the dialog infrastructure:
-    /// ViewModel -> IDialogService -> DialogFactory -> ContentDialog.
-    /// </summary>
-    [RelayCommand]
-    private async Task TestDialogAsync()
-    {
-        await _dialogService.ShowDialogAsync<TestDialogViewModel>();
-    }
-
-    #endregion
-
-    #region TODO / Extensions
-
-    // TODO: Move version into IAppInfo / IEnvironmentService (decouple from VM)
-    // NOTE: Hardcoded version string is acceptable for early stage, but not for production pipelines
-    // TODO: Consider exposing build metadata (Git hash, build date)
-
-    #endregion
 }

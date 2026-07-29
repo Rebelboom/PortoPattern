@@ -11,6 +11,8 @@
     <SolidColorBrush x:Key="Porto.Surface.Default" Color="#000000" />
     <SolidColorBrush x:Key="Porto.Surface.Secondary" Color="#000000" />
     <SolidColorBrush x:Key="Porto.Surface.Card" Color="#000000" />
+    <SolidColorBrush x:Key="Rebel.Transparent" Color="Transparent"/>
+    
 
     <!-- ========================================== -->
     <!-- PORTO: ELEMENTS (ЭЛЕМЕНТЫ И ИХ СОСТОЯНИЯ)  -->

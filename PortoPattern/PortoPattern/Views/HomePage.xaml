@@ -20,7 +20,7 @@
         -->
         <StackPanel Spacing="8" Margin="0,0,0,40">
             <TextBlock Text="Домашняя страница" 
-                       FontSize="{StaticResource FontSizeHuge}" 
+                       FontSize="{ThemeResource FontSizeHuge}" 
                        FontWeight="Bold" 
                        Foreground="{ThemeResource Porto.Text.Header}"/>
 

@@ -69,8 +69,9 @@
                                         OffsetY="4"
                                         VerticalAlignment="Stretch">
 
+                <!-- Mode=OneTime для ItemsSource, так как ссылка на коллекцию не пересоздается -->
                 <ListView x:Name="ProfilesList"
-                          ItemsSource="{x:Bind ViewModel.Profiles, Mode=OneWay}"
+                          ItemsSource="{x:Bind ViewModel.Profiles, Mode=OneTime}"
                           SelectionMode="None"
                           Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                           BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
@@ -100,6 +101,7 @@
                                                    FontSize="15" 
                                                    VerticalAlignment="Center"/>
 
+                                        <!-- ИСПРАВЛЕНИЕ WMC1506: Заменено Mode=OneWay на Mode=OneTime -->
                                         <Button Grid.Column="1" 
                                                 Content="&#xE74D;" 
                                                 FontFamily="{ThemeResource SymbolThemeFontFamily}"
@@ -108,7 +110,7 @@
                                                 Foreground="{ThemeResource SystemFillColorCriticalBrush}"
                                                 Command="{Binding DataContext.RemoveProfileCommand, ElementName=ProfilesList}" 
                                                 CommandParameter="{Binding}"
-                                                Visibility="{x:Bind helpers:ProfileUIHelper.HideIfSystem(IsSystem), Mode=OneWay}"
+                                                Visibility="{x:Bind helpers:ProfileUIHelper.HideIfSystem(IsSystem), Mode=OneTime}"
                                                 ToolTipService.ToolTip="Удалить профиль"
                                                 Margin="0,0,16,0"
                                                 VerticalAlignment="Center"/>
@@ -122,8 +124,9 @@
 
                                 <Expander.Content>
                                     <StackPanel Spacing="8">
+                                        <!-- ИСПРАВЛЕНИЕ WMC1506: Заменено Mode=OneWay на Mode=OneTime -->
                                         <Grid ColumnSpacing="12" 
-                                              Visibility="{x:Bind helpers:ProfileUIHelper.HideIfSystem(IsSystem), Mode=OneWay}">
+                                              Visibility="{x:Bind helpers:ProfileUIHelper.HideIfSystem(IsSystem), Mode=OneTime}">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="Auto"/>
@@ -142,7 +145,7 @@
                                                       VerticalAlignment="Center"/>
                                         </Grid>
 
-                                        <ItemsControl ItemsSource="{x:Bind ObservableRules, Mode=OneWay}">
+                                        <ItemsControl ItemsSource="{x:Bind ObservableRules, Mode=OneTime}">
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate x:DataType="models:IgnorRule">
                                                     <Grid Padding="5,4" ColumnSpacing="10">
@@ -178,34 +181,36 @@
                                                         </Grid>
 
                                                         <TextBlock Grid.Column="1" 
-                                                                   Text="{x:Bind RealPath}" 
+                                                                   Text="{x:Bind RealPath, Mode=OneTime}" 
                                                                    Visibility="{Binding IsSystem, Converter={StaticResource BooleanVisibility}}"
                                                                    VerticalAlignment="Center" 
                                                                    TextTrimming="CharacterEllipsis" 
                                                                    FontSize="13"/>
 
+                                                        <!-- ИСПРАВЛЕНИЕ WMC1506 (Строка 190): Заменено Mode=OneWay на Mode=OneTime -->
                                                         <TextBlock Grid.Column="1" 
                                                                    Text="{Binding RealPath, Converter={StaticResource ProfileNameConverter}}" 
                                                                    ToolTipService.ToolTip="{Binding Converter={StaticResource RuleTooltipConverter}}"
-                                                                   Visibility="{x:Bind helpers:ProfileUIHelper.HideIfSystem(IsSystem), Mode=OneWay}"
+                                                                   Visibility="{x:Bind helpers:ProfileUIHelper.HideIfSystem(IsSystem), Mode=OneTime}"
                                                                    VerticalAlignment="Center" 
                                                                    TextTrimming="CharacterEllipsis" 
                                                                    FontSize="13"/>
 
                                                         <TextBlock Grid.Column="2" 
-                                                                   Text="{x:Bind VirtualVariable}" 
+                                                                   Text="{x:Bind VirtualVariable, Mode=OneTime}" 
                                                                    Visibility="{Binding IsSystem, Converter={StaticResource BooleanVisibility}}"
                                                                    Foreground="Gray" 
                                                                    VerticalAlignment="Center" 
                                                                    FontSize="12"/>
 
                                                         <TextBlock Grid.Column="3" 
-                                                                   Text="{x:Bind Mode}" 
+                                                                   Text="{x:Bind Mode, Mode=OneTime}" 
                                                                    Visibility="{Binding IsSystem, Converter={StaticResource BooleanVisibility}}"
                                                                    Foreground="DodgerBlue" 
                                                                    VerticalAlignment="Center" 
                                                                    FontSize="12"/>
 
+                                                        <!-- ИСПРАВЛЕНИЕ WMC1506 (Строка 216): Заменено Mode=OneWay на Mode=OneTime -->
                                                         <Button Grid.Column="4" 
                                                                 Content="&#xE74D;" 
                                                                 FontFamily="{ThemeResource SymbolThemeFontFamily}"
@@ -213,7 +218,7 @@
                                                                 BorderBrush="Transparent"
                                                                 Command="{Binding DataContext.RemoveFolderFromProfileCommand, ElementName=ProfilesList}" 
                                                                 CommandParameter="{Binding}"
-                                                                Visibility="{x:Bind helpers:ProfileUIHelper.HideIfSystem(IsSystem), Mode=OneWay}"
+                                                                Visibility="{x:Bind helpers:ProfileUIHelper.HideIfSystem(IsSystem), Mode=OneTime}"
                                                                 ToolTipService.ToolTip="Удалить папку"/>
                                                     </Grid>
                                                 </DataTemplate>

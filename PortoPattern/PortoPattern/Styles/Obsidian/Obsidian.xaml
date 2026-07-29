@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- ========================================== -->
+    <!-- SURFACES                                   -->
+    <!-- ========================================== -->
+
+    <SolidColorBrush x:Key="Rebel.Surface.Root" Color="#0D0D12"/>
+    <SolidColorBrush x:Key="Rebel.Surface.Default" Color="#14141B"/>
+    <SolidColorBrush x:Key="Rebel.Surface.Secondary" Color="#1E1E28"/>
+    <SolidColorBrush x:Key="Rebel.Surface.Card" Color="#272734"/>
+
+    <!-- ========================================== -->
+    <!-- TEXT                                       -->
+    <!-- ========================================== -->
+
+    <SolidColorBrush x:Key="Rebel.Text.Primary" Color="#F8F8F8"/>
+    <SolidColorBrush x:Key="Rebel.Text.Secondary" Color="#A1A1AA"/>
+    <SolidColorBrush x:Key="Rebel.Text.Disabled" Color="#52525B"/>
+    <SolidColorBrush x:Key="Rebel.Text.Accent" Color="#818CF8"/>
+
+    <!-- ========================================== -->
+    <!-- ACCENT                                     -->
+    <!-- ========================================== -->
+
+    <SolidColorBrush x:Key="Rebel.Accent.Default" Color="#6366F1"/>
+    <SolidColorBrush x:Key="Rebel.Accent.Hover" Color="#4F46E5"/>
+    <SolidColorBrush x:Key="Rebel.Accent.Pressed" Color="#4338CA"/>
+    <SolidColorBrush x:Key="Rebel.Accent.Disabled" Color="#312E81"/>
+
+    <!-- ========================================== -->
+    <!-- ELEMENTS                                   -->
+    <!-- ========================================== -->
+
+    <SolidColorBrush x:Key="Rebel.Element.Default" Color="#2D2D3B"/>
+    <SolidColorBrush x:Key="Rebel.Element.Hover" Color="#3A3A4A"/>
+    <SolidColorBrush x:Key="Rebel.Element.Pressed" Color="#20202B"/>
+    <SolidColorBrush x:Key="Rebel.Element.Selected" Color="#3A3A4A"/>
+    <SolidColorBrush x:Key="Rebel.Element.Disabled" Color="#1E1E28"/>
+
+    <!-- ========================================== -->
+    <!-- BORDERS                                    -->
+    <!-- ========================================== -->
+
+    <SolidColorBrush x:Key="Rebel.Border.Default" Color="#3F3F4E"/>
+    <SolidColorBrush x:Key="Rebel.Border.Hover" Color="#525266"/>
+    <SolidColorBrush x:Key="Rebel.Border.Pressed" Color="#2D2D3B"/>
+    <SolidColorBrush x:Key="Rebel.Border.Focus" Color="#6366F1"/>
+    <SolidColorBrush x:Key="Rebel.Border.Disabled" Color="#272734"/>
+
+    <!-- ========================================== -->
+    <!-- STATUS                                     -->
+    <!-- ========================================== -->
+
+    <SolidColorBrush x:Key="Rebel.Status.Success" Color="#10B981"/>
+    <SolidColorBrush x:Key="Rebel.Status.Warning" Color="#F59E0B"/>
+    <SolidColorBrush x:Key="Rebel.Status.Error" Color="#EF4444"/>
+    <SolidColorBrush x:Key="Rebel.Status.Info" Color="#3B82F6"/>
+
+    <SolidColorBrush x:Key="Rebel.Transparent" Color="Transparent"/>
+
+</ResourceDictionary>

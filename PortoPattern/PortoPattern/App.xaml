@@ -2,9 +2,6 @@
 <!-- 
     Файл: App.xaml
     Описание: Глобальные ресурсы приложения.
-    Правки: 
-    - Удалена ссылка на Themes/Styles.xaml.
-    - Добавлены цвета темы Coral Mint напрямую в Application.Resources.
 -->
 <Application
     x:Class="PortoPattern.App"
@@ -20,6 +17,9 @@
                 <ResourceDictionary Source="ms-appx:///Controls/FolderCardStyle.xaml"/>
                 <ResourceDictionary Source="ms-appx:///Styles/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+
+
+
 
             <!-- Глобальная палитра приложения (Coral Mint) -->
             <SolidColorBrush x:Key="App.Background" Color="#F97316"/>

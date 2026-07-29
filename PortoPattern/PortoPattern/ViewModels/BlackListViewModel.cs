@@ -3,7 +3,6 @@
 // Description: ViewModel for managing blacklist profiles and rules.
 //              Bridges UI interaction with IgnorManager persistence layer.
 // ****************************************************************************
-
 #nullable enable
 
 using System;
@@ -45,8 +44,10 @@ public partial class BlackListViewModel : NavigableViewModel
 
     #region Properties
 
+    // TODO: [РЕАЛИЗОВАНО] Исправление MVVMTK0045: 
+    // Заменено приватное поле на public partial свойство для совместимости с Native AOT в WinRT (CsWinRT).
     [ObservableProperty]
-    private string _newProfileName = string.Empty;
+    public partial string NewProfileName { get; set; }
 
     public ObservableCollection<BlackListProfileViewModel> Profiles { get; } = new();
 
@@ -64,6 +65,9 @@ public partial class BlackListViewModel : NavigableViewModel
         _filePickerService = filePickerService ?? throw new ArgumentNullException(nameof(filePickerService));
         _ignorManager = ignorManager ?? throw new ArgumentNullException(nameof(ignorManager));
         _ruleGenerator = ruleGenerator ?? throw new ArgumentNullException(nameof(ruleGenerator));
+
+        // Инициализация partial свойства вынесена в конструктор
+        NewProfileName = string.Empty;
 
         // NOTE: Global static save hook (high coupling risk)
         SaveRequest = PersistProfiles;

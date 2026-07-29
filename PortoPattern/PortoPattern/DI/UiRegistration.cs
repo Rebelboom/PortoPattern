@@ -5,17 +5,18 @@
 
 #nullable enable
 
-using System;
 using Microsoft.Extensions.DependencyInjection;
-using PortoPattern.Interfaces;
-using PortoPattern.Services;
-using PortoPattern.Services.Dialogs;
 using PortoPattern.Dialogs;
+using PortoPattern.Interfaces;
 using PortoPattern.Navigation;
 using PortoPattern.Navigation.Interfaces;
 using PortoPattern.Navigation.Services;
+using PortoPattern.Services;
+using PortoPattern.Services.Dialogs;
+using PortoPattern.Themes;
 using PortoPattern.ViewModels;
 using PortoPattern.Views;
+using System;
 
 namespace PortoPattern.DI;
 
@@ -36,6 +37,8 @@ public static class UiRegistration
         // =========================================================
         services.AddSingleton<IWindowProvider, WindowProvider>();
         services.AddSingleton<IFilePickerService, FilePickerService>();
+        services.AddSingleton<IThemeService, ThemeService>();
+        
 
         // =========================================================
         // БЛОК 3: DIALOG SYSTEM
