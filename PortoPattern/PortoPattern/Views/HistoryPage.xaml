@@ -7,7 +7,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:history="using:PortoPattern.Core.History"
     mc:Ignorable="d"
-    Background="{ThemeResource Rebel.Surfacet.Root}">
+    Background="{ThemeResource Rebel.Surface.Root}">
+    <!-- Исправлена опечатка в ключе корневой поверхности -->
 
     <Grid Padding="24">
         <Grid.RowDefinitions>
@@ -15,6 +16,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
+        <!-- Шапка страницы -->
         <Grid Grid.Row="0" Margin="0,0,0,24">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -22,55 +24,74 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
+            <!-- Кнопка навигации назад -->
             <Button Grid.Column="0" 
                     Style="{StaticResource NavigationBackButtonNormalStyle}"
                     Command="{x:Bind ViewModel.GoBackCommand}"
                     Margin="0,0,16,0"/>
 
+            <!-- Заголовок страницы с использованием шрифтового акцента -->
             <TextBlock Grid.Column="1" 
                        Text="История сканирований" 
                        Style="{StaticResource TitleTextBlockStyle}" 
+                       Foreground="{ThemeResource Rebel.Text.Header}"
                        VerticalAlignment="Center"/>
 
+            <!-- Кнопка очистки истории -->
             <Button Grid.Column="2" 
                     Content="Очистить историю" 
                     Command="{x:Bind ViewModel.ClearHistoryCommand}"
                     IsEnabled="{x:Bind ViewModel.IsEmpty, Converter={StaticResource BoolNegationConverter}, Mode=OneWay}"/>
         </Grid>
 
+        <!-- Заглушка при пустой истории -->
         <TextBlock Grid.Row="1" 
                    Text="История сканирований пуста."
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"
                    Visibility="{x:Bind ViewModel.IsEmpty, Converter={StaticResource BooleanVisibility}, Mode=OneWay}"
-                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                   Foreground="{ThemeResource Rebel.Text.Secondary}"/>
 
+        <!-- Список элементов истории -->
         <ListView Grid.Row="1" 
                   ItemsSource="{x:Bind ViewModel.HistoryItems, Mode=OneWay}"
                   Visibility="{x:Bind ViewModel.IsEmpty, Converter={StaticResource BooleanVisibilityInverse}, Mode=OneWay}"
                   SelectionMode="None">
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="history:ScanHistoryItem">
-                    <Grid Padding="16" Margin="0,4,0,4" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8">
+                    <!-- Карточка элемента истории с привязкой к карточной экосистеме -->
+                    <Grid Padding="16" Margin="0,4,0,4" 
+                          Background="{ThemeResource Rebel.Surface.Card.Default}" 
+                          BorderBrush="{ThemeResource Rebel.Border.Card.Default}"
+                          BorderThickness="1"
+                          CornerRadius="8">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
+                        <!-- Левая колонка: путь и время сканирования -->
                         <StackPanel Grid.Column="0">
-                            <TextBlock Text="{x:Bind TargetPath}" FontWeight="SemiBold" FontSize="16" TextTrimming="CharacterEllipsis"/>
-                            <!-- Исправлено здесь: используем FormattedScanTime -->
-                            <TextBlock Text="{x:Bind FormattedScanTime}" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Margin="0,4,0,0"/>
+                            <TextBlock Text="{x:Bind TargetPath}" 
+                                       FontWeight="SemiBold" 
+                                       FontSize="16" 
+                                       Foreground="{ThemeResource Rebel.Text.Card}"
+                                       TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Text="{x:Bind FormattedScanTime}" 
+                                       FontSize="12" 
+                                       Foreground="{ThemeResource Rebel.Text.Secondary}" 
+                                       Margin="0,4,0,0"/>
                         </StackPanel>
 
+                        <!-- Правая колонка: цифровая статистика -->
                         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Spacing="24">
                             <StackPanel>
-                                <TextBlock Text="Файлы" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                                <TextBlock Text="{x:Bind TotalFiles}" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                                <TextBlock Text="Файлы" FontSize="12" Foreground="{ThemeResource Rebel.Text.Secondary}"/>
+                                <TextBlock Text="{x:Bind TotalFiles}" FontWeight="SemiBold" Foreground="{ThemeResource Rebel.Text.Card}" HorizontalAlignment="Right"/>
                             </StackPanel>
                             <StackPanel>
-                                <TextBlock Text="Категории" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                                <TextBlock Text="{x:Bind CategoriesCount}" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                                <TextBlock Text="Категории" FontSize="12" Foreground="{ThemeResource Rebel.Text.Secondary}"/>
+                                <TextBlock Text="{x:Bind CategoriesCount}" FontWeight="SemiBold" Foreground="{ThemeResource Rebel.Text.Card}" HorizontalAlignment="Right"/>
                             </StackPanel>
                         </StackPanel>
                     </Grid>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- ========================================== -->
+    <!-- STATUS COLORS (СТАТУСЫ И УВЕДОМЛЕНИЯ)      -->
+    <!-- Универсальные цвета для бейджей, алертов   -->
+    <!-- ========================================== -->
+
+    <!-- Успешное выполнение, позитивный статус -->
+    <SolidColorBrush x:Key="Rebel.Status.Success" Color="#10B981"/>
+
+    <!-- Предупреждение, требующее внимания -->
+    <SolidColorBrush x:Key="Rebel.Status.Warning" Color="#F59E0B"/>
+
+    <!-- Ошибка, критический сбой или отмена -->
+    <SolidColorBrush x:Key="Rebel.Status.Error" Color="#EF4444"/>
+
+    <!-- Информационное сообщение или подсказка -->
+    <SolidColorBrush x:Key="Rebel.Status.Info" Color="#3B82F6"/>
+
+    <!-- Нейтральный статус (для неактивных или фоновых меток) -->
+    <SolidColorBrush x:Key="Rebel.Status.Neutral" Color="#71717A"/>
+
+    <!-- ========================================== -->
+    <!-- UTILITY & TRANSPARENCY (УТИЛИТЫ И ФОНЫ)    -->
+    <!-- ========================================== -->
+
+    <!-- Абсолютно прозрачный цвет для невидимых элементов и границ -->
+    <SolidColorBrush x:Key="Rebel.Transparent" Color="Transparent"/>
+
+    <!-- Полупрозрачный слой затемнения (Scrim/Overlay) для модальных окон -->
+    <SolidColorBrush x:Key="Rebel.Overlay.Scrim" Color="#B3000000"/>
+
+    <!-- ========================================== -->
+    <!-- FOCUS & INTERACTION (УНИВЕРСАЛЬНЫЙ ФОКУС)  -->
+    <!-- ========================================== -->
+
+    <!-- Стандартное свечение фокуса клавиатуры (доступность/Accessibility) -->
+    <SolidColorBrush x:Key="Rebel.Focus.Ring" Color="#3B82F6"/>
+
+</ResourceDictionary>

@@ -10,7 +10,9 @@ namespace PortoPattern.Core.Settings;
 public sealed class AppSettings
 {
     /// <summary>
-    /// Использовать темную тему приложения.
+    /// Текущая выбранная тема приложения.
+    /// Хранится в настройках пользователя.
+    /// Например: Midnight, Obsidian, CoralMint.
     /// </summary>
-    public bool IsDarkMode { get; set; }
+    public string Theme { get; set; } = "Obsidian";
 }

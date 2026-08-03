@@ -7,8 +7,10 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
+    Background="{ThemeResource Rebel.Surface.Root}"
     d:DataContext="{d:DesignInstance Type=vm:ShellViewModel, IsDesignTimeCreatable=False}">
 
+    <!-- Корневой элемент управления навигацией приложения -->
     <NavigationView
         x:Name="RootNavigation"
         IsBackButtonVisible="Visible"
@@ -17,16 +19,25 @@
         BackRequested="OnBackRequested"
         PaneDisplayMode="Left">
 
+        <!-- Основные элементы меню навигации с явно заданным цветом текста из тем -->
         <NavigationView.MenuItems>
-            <NavigationViewItem Content="Главная" Tag="Home" Icon="Home" />
-            <NavigationViewItem Content="Дашборд" Tag="Dashboard" Icon="Document" />
-            <NavigationViewItem Content="История" Tag="History" Icon="PhoneBook" />
+            <!-- Пункт меню Главная с применением ключа Rebel.Text.Nav.Default -->
+            <NavigationViewItem Content="Главная" Tag="Home" Icon="Home" Foreground="{ThemeResource Rebel.Text.Nav.Default}" />
+
+            <!-- Пункт меню Дашборд с применением ключа Rebel.Text.Nav.Default -->
+            <NavigationViewItem Content="Дашборд" Tag="Dashboard" Icon="Document" Foreground="{ThemeResource Rebel.Text.Nav.Hover}" />
+
+            <!-- Пункт меню История с применением ключа Rebel.Text.Nav.Default -->
+            <NavigationViewItem Content="История" Tag="History" Icon="PhoneBook" Foreground="{ThemeResource Rebel.Text.Nav.Default}" />
         </NavigationView.MenuItems>
 
+        <!-- Нижние вспомогательные элементы меню навигации -->
         <NavigationView.FooterMenuItems>
+            <!-- Пункт меню О программе -->
             <NavigationViewItem Content="О программе" Tag="About" Icon="Help" />
         </NavigationView.FooterMenuItems>
 
+        <!-- Область отображения динамического контента страниц -->
         <Grid>
             <Frame x:Name="ContentFrame" />
         </Grid>

@@ -5,6 +5,9 @@ using PortoPattern.Core.IgnorSpace;
 using PortoPattern.Core.Interfaces;
 using PortoPattern.Core.Services;
 using PortoPattern.Core.Settings;
+using PortoPattern.Core.Themes;
+using PortoPattern.Themes;
+
 
 namespace PortoPattern.DI;
 
@@ -19,6 +22,7 @@ public static class CoreRegistration
         services.AddSingleton<IgnorFilterService>();
         services.AddSingleton<IScanHistoryService, ScanHistoryService>();
         services.AddSingleton<ISettingsService, SettingsService>();
+        services.AddSingleton<IThemeService, ThemeService>();
 
         return services;
     }

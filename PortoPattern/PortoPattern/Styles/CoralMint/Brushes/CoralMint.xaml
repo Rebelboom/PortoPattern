@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- ========================================== -->
+    <!-- SURFACES (БАЗОВЫЕ ПОВЕРХНОСТИ)             -->
+    <!-- ========================================== -->
+    <SolidColorBrush x:Key="Rebel.Surface.Root" Color="OrangeRed"/>
+    <SolidColorBrush x:Key="Rebel.Surface.Default" Color="#1E293B"/>
+    <SolidColorBrush x:Key="Rebel.Surface.Secondary" Color="#1E293B"/>
+
+    <!-- ========================================== -->
+    <!-- CARDS ECOSYSTEM (КАРТОЧКИ)                 -->
+    <!-- ========================================== -->
+    <!-- Темный сине-серый фон карточки -->
+    <SolidColorBrush x:Key="Rebel.Surface.Card.Default" Color="#334155"/>
+    <!-- Высветление карточки при наведении -->
+    <SolidColorBrush x:Key="Rebel.Surface.Card.Hover" Color="#475569"/>
+
+    <!-- Ненавязчивая граница карточки -->
+    <SolidColorBrush x:Key="Rebel.Border.Card.Default" Color="#475569"/>
+    <!-- Мятный акцент границы при наведении -->
+    <SolidColorBrush x:Key="Rebel.Border.Card.Hover" Color="#34D399"/>
+
+    <!-- Текст карточки (холодный белый для читаемости) -->
+    <SolidColorBrush x:Key="Rebel.Text.Card" Color="#F8FAFC"/>
+
+    <!-- ========================================== -->
+    <!-- SEARCH HIGHLIGHT (ПОДСВЕТКА ПОИСКА)        -->
+    <!-- ========================================== -->
+    <!-- Фон подсветки поиска (яркий коралловый, отличный контраст с мятным и сланцевым) -->
+    <SolidColorBrush x:Key="Rebel.Highlight.Search.Background" Color="#F43F5E"/>
+    <!-- Текст на коралловом фоне (белый) -->
+    <SolidColorBrush x:Key="Rebel.Highlight.Search.Foreground" Color="#FFFFFF"/>
+
+    <!-- ========================================== -->
+    <!-- ELEMENTS (КНОПКИ И КОНТРОЛЫ)               -->
+    <!-- ========================================== -->
+    <SolidColorBrush x:Key="Rebel.Element.Default" Color="#0F766E"/>
+    <SolidColorBrush x:Key="Rebel.Element.Hover" Color="#14B8A6"/>
+
+    <!-- ========================================== -->
+    <!-- BORDERS (ОБЩИЕ ГРАНИЦЫ)                    -->
+    <!-- ========================================== -->
+    <SolidColorBrush x:Key="Rebel.Border.Default" Color="#334155"/>
+    <SolidColorBrush x:Key="Rebel.Border.Hover" Color="#F43F5E"/>
+
+    <!-- ========================================== -->
+    <!-- TEXT (ОБЩИЙ ТЕКСТ)                         -->
+    <!-- ========================================== -->
+    <SolidColorBrush x:Key="Rebel.Text.Primary" Color="#F8FAFC"/>
+    <SolidColorBrush x:Key="Rebel.Text.Secondary" Color="#94A3B8"/>
+    <SolidColorBrush x:Key="Rebel.Text.Header" Color="#FB7185"/>
+
+    <SolidColorBrush x:Key="Rebel.Text.Nav.Default" Color="#6EE7B7"/>
+    <SolidColorBrush x:Key="Rebel.Text.Nav.Hover" Color="#FFFFFF"/>
+
+    <!-- ========================================== -->
+    <!-- GENERAL EFFECTS (ОБЩИЕ ЭФФЕКТЫ)            -->
+    <!-- ========================================== -->
+    <SolidColorBrush x:Key="Rebel.Highlighter" Color="#34D399"/>
+    <SolidColorBrush x:Key="Rebel.Highlight.Background" Color="Transparent"/>
+    <SolidColorBrush x:Key="Rebel.Highlight.Foreground" Color="#FDA4AF"/>
+    <SolidColorBrush x:Key="Rebel.Transparent" Color="Transparent"/>
+
+</ResourceDictionary>

@@ -15,6 +15,6 @@
         <TextBlock x:Name="PART_TextBlock" 
                    TextWrapping="{x:Bind TextWrapping, Mode=OneWay}"
                    FontSize="{x:Bind FontSize, Mode=OneWay}"
-                   Foreground="{ThemeResource Porto.Text.Default}"/>
+                   Foreground="{ThemeResource Rebel.Highlighter}"/>
     </Grid>
 </UserControl>

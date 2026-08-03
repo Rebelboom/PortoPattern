@@ -1,87 +1,126 @@
 ﻿// ****************************************************************************
 // File: ThemeService.cs
-// Description: Сервис смены темы WinUI 3.
-// Меняет тему XAML-контента и системного TitleBar через AppWindow API.
+// Description: Реализация сервиса управления темами с мгновенным чтением темы в конструкторе.
 // ****************************************************************************
-
 #nullable enable
-
 using System;
-using Microsoft.UI.Windowing;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.UI.Xaml;
-using PortoPattern.Interfaces;
-
+using PortoPattern.Core.Settings;
+using PortoPattern.Core.Themes;
 namespace PortoPattern.Themes;
-
+/// <summary>
+/// Сервис для управления глобальной цветовой темой приложения.
+/// </summary>
 public sealed class ThemeService : IThemeService
 {
-    private readonly IWindowProvider _windowProvider;
+    private readonly ISettingsService _settingsService;
 
-    private FrameworkElement? _rootElement;
+    /// <summary>
+    /// Текущая активная тема приложения.
+    /// </summary>
+    public AppTheme CurrentTheme { get; private set; } = AppTheme.Obsidian;
 
+    /// <summary>
+    /// Событие, вызываемое при изменении темы приложения.
+    /// </summary>
+    public event EventHandler<AppTheme>? ThemeChanged;
 
-    public ThemeService(IWindowProvider windowProvider)
+    /// <summary>
+    /// Инициализирует новый экземпляр класса ThemeService и сразу считывает тему из настроек.
+    /// </summary>
+    public ThemeService(ISettingsService settingsService)
     {
-        _windowProvider = windowProvider;
+        _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
+
+        // Сразу в конструкторе пытаемся прочитать сохраненную тему из JSON,
+        // чтобы CurrentTheme никогда не оставался в дефолтном Obsidian при старте.
+        try
+        {
+            string? savedTheme = _settingsService.Settings.Theme;
+            if (!string.IsNullOrEmpty(savedTheme) &&
+                Enum.TryParse<AppTheme>(savedTheme, true, out var result))
+            {
+                CurrentTheme = result;
+            }
+        }
+        catch
+        {
+            CurrentTheme = AppTheme.Obsidian;
+        }
     }
 
-
-    public void SetRootElement(FrameworkElement rootElement)
+    /// <summary>
+    /// Применяет текущую тему к ресурсам приложения при старте.
+    /// </summary>
+    public void Initialize()
     {
-        ArgumentNullException.ThrowIfNull(rootElement);
-
-        _rootElement = rootElement;
+        ApplyThemeInternal(CurrentTheme, saveToSettings: false);
     }
 
-
-    public void SetTheme(bool isDarkMode)
+    /// <summary>
+    /// Устанавливает новую тему по выбору пользователя, обновляет словари и сохраняет в JSON.
+    /// </summary>
+    public void SetTheme(AppTheme theme)
     {
-        ApplyTitleBarTheme(isDarkMode);
-
-        ApplyXamlTheme(isDarkMode);
+        ApplyThemeInternal(theme, saveToSettings: true);
     }
 
-
-    private void ApplyTitleBarTheme(bool isDarkMode)
+    /// <summary>
+    /// Внутренний метод для безопасного применения темы и управления словарями ресурсов.
+    /// </summary>
+    private void ApplyThemeInternal(AppTheme theme, bool saveToSettings)
     {
-        if (!_windowProvider.IsInitialized)
-            return;
+        try
+        {
+            var currentApp = Application.Current;
+            if (currentApp?.Resources?.MergedDictionaries == null)
+            {
+#if DEBUG
+                Console.WriteLine("[DEBUG ERROR] ThemeService: Application resources are not initialized yet.");
+#endif
+                return;
+            }
 
+            var mergedDictionaries = currentApp.Resources.MergedDictionaries;
 
-        IntPtr hwnd = _windowProvider.GetMainWindowHandle();
+            string themeName = theme.ToString();
+            string uriString = $"ms-appx:///Styles/{themeName}/Brushes/{themeName}.xaml";
 
-        if (hwnd == IntPtr.Zero)
-            return;
+            // Удаляем все ранее подключенные словари кистей тем
+            var oldDictionaries = mergedDictionaries
+                .Where(d => d.Source != null && d.Source.AbsoluteUri.Contains("/Brushes/", StringComparison.OrdinalIgnoreCase))
+                .ToList();
 
+            foreach (var oldDict in oldDictionaries)
+            {
+                mergedDictionaries.Remove(oldDict);
+            }
 
-        var windowId =
-            Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hwnd);
+            // Создаем новый словарь ресурсов
+            ResourceDictionary newDictionary = new ResourceDictionary
+            {
+                Source = new Uri(uriString, UriKind.Absolute)
+            };
 
+            mergedDictionaries.Add(newDictionary);
 
-        var appWindow =
-            AppWindow.GetFromWindowId(windowId);
+            CurrentTheme = theme;
 
+            if (saveToSettings)
+            {
+                _settingsService.Settings.Theme = themeName;
+                _settingsService.Save();
+            }
 
-        if (appWindow == null)
-            return;
-
-
-        appWindow.TitleBar.PreferredTheme =
-            isDarkMode
-                ? TitleBarTheme.Dark
-                : TitleBarTheme.Light;
-    }
-
-
-    private void ApplyXamlTheme(bool isDarkMode)
-    {
-        if (_rootElement == null)
-            return;
-
-
-        _rootElement.RequestedTheme =
-            isDarkMode
-                ? ElementTheme.Dark
-                : ElementTheme.Light;
+            ThemeChanged?.Invoke(this, theme);
+        }
+        catch (Exception ex)
+        {
+#if DEBUG
+            Console.WriteLine($"[DEBUG ERROR] ThemeService.ApplyThemeInternal failed for '{theme}': {ex.Message}");
+#endif
+        }
     }
 }

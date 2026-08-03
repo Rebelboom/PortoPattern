@@ -1,71 +1,68 @@
 ﻿// ****************************************************************************
 // File: SettingsViewModel.cs
-// Description: ViewModel для страницы настроек. Управляет настройками темы.
+// Description: ViewModel для страницы настроек. Управляет выбором темы.
 // ****************************************************************************
 
 #nullable enable
 
 using System;
+using PortoPattern.Core.Themes;
 using PortoPattern.Navigation.Interfaces;
-using PortoPattern.Themes;
-using PortoPattern.Core.Settings;
 
 namespace PortoPattern.ViewModels;
 
+/// <summary>
+/// ViewModel страницы настроек приложения.
+/// </summary>
 public partial class SettingsViewModel : NavigableViewModel
 {
+    // Сервис для управления темами приложения
     private readonly IThemeService _themeService;
 
-    // ДОБАВЛЕНО: сервис хранения настроек
-    private readonly ISettingsService _settingsService;
-
-
-    private bool _isDarkMode;
-
-
-    public bool IsDarkMode
+    /// <summary>
+    /// Текущая активная тема приложения для связывания с UI.
+    /// </summary>
+    public AppTheme CurrentTheme
     {
-        get => _isDarkMode;
-
+        get => _themeService.CurrentTheme;
         set
         {
-            if (SetProperty(ref _isDarkMode, value))
+            // Проверяем, отличается ли новое значение от текущего
+            if (_themeService.CurrentTheme != value)
             {
-                // ДОБАВЛЕНО:
-                // Сначала сохраняем выбор пользователя
-                _settingsService.Settings.IsDarkMode = value;
-                _settingsService.Save();
-
-                // Затем применяем тему
+                // Устанавливаем новую тему через сервис
                 _themeService.SetTheme(value);
+                OnPropertyChanged();
             }
         }
     }
 
+    /// <summary>
+    /// Массив всех доступных тем для заполнения списка в UI.
+    /// </summary>
+    public AppTheme[] AvailableThemes => (AppTheme[])Enum.GetValues(typeof(AppTheme));
 
+    /// <summary>
+    /// Инициализирует новый экземпляр SettingsViewModel.
+    /// </summary>
     public SettingsViewModel(
         INavigationService navigation,
-        IThemeService themeService,
-        ISettingsService settingsService) // ДОБАВЛЕНО
+        IThemeService themeService)
         : base(navigation)
     {
-        _themeService = themeService
-            ?? throw new ArgumentNullException(nameof(themeService));
+        // Проверяем зависимость на null
+        _themeService = themeService ?? throw new ArgumentNullException(nameof(themeService));
 
+        // Подписываемся на внешние изменения темы для синхронизации UI
+        _themeService.ThemeChanged += OnThemeChanged;
+    }
 
-        // ДОБАВЛЕНО:
-        // Получаем сервис настроек из DI
-        _settingsService = settingsService
-            ?? throw new ArgumentNullException(nameof(settingsService));
-
-
-        // УДАЛЕНО:
-        // Application.Current.RequestedTheme здесь использовать нельзя.
-        // Он не отражает состояние, которое мы меняем через ThemeService.
-
-
-        // ДОБАВЛЕНО:
-        // Начальное состояние ToggleSwitch берём из сохранённых настроек.
-        _isDarkMode = _settingsService.Settings.IsDarkMode;
+    /// <summary>
+    /// Обработчик события изменения темы.
+    /// </summary>
+    private void OnThemeChanged(object? sender, AppTheme e)
+    {
+        // Уведомляем UI об изменении свойства текущей темы
+        OnPropertyChanged(nameof(CurrentTheme));
     }
 }

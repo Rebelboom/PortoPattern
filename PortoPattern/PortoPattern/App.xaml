@@ -15,7 +15,7 @@
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
                 <ResourceDictionary Source="ms-appx:///Controls/CardButtonStyle.xaml"/>
                 <ResourceDictionary Source="ms-appx:///Controls/FolderCardStyle.xaml"/>
-                <ResourceDictionary Source="ms-appx:///Styles/Styles.xaml"/>
+                <ResourceDictionary Source="ms-appx:///Styles/Default/Brushes/Default.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
 
@@ -45,6 +45,7 @@
             <Converters:BoolNegationConverter x:Key="BoolNegationConverter"/>
             <Converters:ConvertProfileName x:Key="ProfileNameConverter"/>
             <Converters:ConvertRuleToTooltip x:Key="RuleTooltipConverter"/>
+            <Converters:AppThemeConverter x:Key="AppThemeConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -6,7 +6,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:root="using:PortoPattern"
-    BorderBrush="{StaticResource BorderBrush}"
     BorderThickness="1"
     CloseButtonText=""
     CornerRadius="5"
@@ -20,11 +19,13 @@
             <Setter Property="CornerRadius" Value="4" />
         </Style>
     </ContentDialog.PrimaryButtonStyle>
+
     <ContentDialog.SecondaryButtonStyle>
         <Style TargetType="Button">
             <Setter Property="CornerRadius" Value="4" />
         </Style>
     </ContentDialog.SecondaryButtonStyle>
+
     <ContentDialog.CloseButtonStyle>
         <Style TargetType="Button">
             <Setter Property="CornerRadius" Value="4" />
@@ -36,10 +37,12 @@
             x:Name="cdGrid"
             MinWidth="500"
             HorizontalAlignment="Stretch">
+
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
+
             <StackPanel
                 x:Name="cdStack"
                 Grid.Column="0"
@@ -48,17 +51,17 @@
                 VerticalAlignment="Top"
                 Orientation="Horizontal"
                 Spacing="12">
+
                 <TextBlock
                     FontSize="{StaticResource FontSizeHuge}"
-                    Foreground="{StaticResource SecondaryBrush}"
                     Text="About&#x0020;" />
-                <!-- NOTE: Привязка изменена на свойство ViewModel -->
+
                 <TextBlock
                     x:Name="tbTitle"
                     FontSize="{StaticResource FontSizeHuge}"
-                    Foreground="{StaticResource SecondaryBrush}"
                     Text="{x:Bind ViewModel.AppName, Mode=OneWay}" />
             </StackPanel>
+
             <Image
                 x:Name="imgLevel"
                 Grid.Column="1"
@@ -71,6 +74,7 @@
     </ContentDialog.Title>
 
     <Grid>
+
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -79,30 +83,24 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- NOTE: Привязка изменена на свойство ViewModel -->
         <TextBlock
             Grid.Row="0"
             Margin="20,10,20,5"
             FontSize="{StaticResource FontSizeMedium}"
-            Foreground="{StaticResource PrimaryBrush}"
             Text="{x:Bind ViewModel.Author, Mode=OneWay}"
             TextWrapping="Wrap" />
 
-        <!-- NOTE: Привязка изменена на свойство ViewModel -->
         <TextBlock
             Grid.Row="1"
             Margin="20,5,20,5"
             FontSize="{StaticResource FontSizeMedium}"
-            Foreground="{StaticResource PrimaryBrush}"
             Text="{x:Bind ViewModel.Description, Mode=OneWay}"
             TextWrapping="Wrap" />
 
-        <!-- NOTE: Привязка изменена на свойство ViewModel -->
         <TextBlock
             Grid.Row="2"
             Margin="20,5,20,5"
             FontSize="{StaticResource FontSizeMedium}"
-            Foreground="{StaticResource PrimaryBrush}"
             Text="{x:Bind ViewModel.EnvironmentNote, Mode=OneWay}"
             TextWrapping="Wrap" />
 
@@ -111,17 +109,17 @@
             Margin="20,5,20,5"
             Orientation="Vertical"
             Spacing="4">
+
             <TextBlock
                 FontSize="{StaticResource FontSizeMedium}"
-                Foreground="{StaticResource SecondaryBrush}"
                 Text="Architecture &amp; Contacts:" />
+
             <ScrollViewer Height="40">
-                <!-- NOTE: Привязка изменена на свойство ViewModel -->
                 <TextBlock
                     FontSize="{StaticResource FontSizeMedium}"
-                    Foreground="DarkBlue"
                     Text="{x:Bind ViewModel.ContactInfo, Mode=OneWay}" />
             </ScrollViewer>
+
         </StackPanel>
 
         <StackPanel
@@ -129,6 +127,7 @@
             Margin="20,20,20,5"
             Orientation="Horizontal"
             Spacing="4">
+
             <Image
                 x:Name="imgSpinner"
                 Width="50"
@@ -139,11 +138,13 @@
                 Opacity="0.9"
                 Source="ms-appx:///Assets/Spinner3.png"
                 Visibility="Visible">
+
                 <Image.Resources>
                     <Storyboard
                         x:Name="StoryboardSpin"
                         AutoReverse="False"
                         RepeatBehavior="Forever">
+
                         <DoubleAnimation
                             x:Name="dblAnimation"
                             Storyboard.TargetName="spinnerTransform"
@@ -151,34 +152,40 @@
                             From="0"
                             To="360"
                             Duration="0:00:01.5" />
+
                     </Storyboard>
                 </Image.Resources>
+
                 <Image.RenderTransform>
-                    <RotateTransform x:Name="spinnerTransform" CenterX="25" CenterY="25" />
+                    <RotateTransform
+                        x:Name="spinnerTransform"
+                        CenterX="25"
+                        CenterY="25" />
                 </Image.RenderTransform>
+
             </Image>
 
             <TextBlock
                 VerticalAlignment="Center"
                 FontSize="{StaticResource FontSizeMedium}"
-                Foreground="{StaticResource SecondaryBrush}"
                 Text="Application version: "
                 TextWrapping="NoWrap" />
-            <!-- NOTE: Привязка изменена на свойство ViewModel -->
+
             <TextBlock
                 VerticalAlignment="Center"
                 FontSize="{StaticResource FontSizeMedium}"
-                Foreground="{StaticResource SecondaryBrush}"
                 Text="{x:Bind ViewModel.AppVersion, Mode=OneWay}"
                 TextWrapping="NoWrap" />
-            <!-- NOTE: Привязка изменена на свойство ViewModel -->
+
             <TextBlock
-                VerticalAlignment="Center"
                 Margin="5,0,0,0"
+                VerticalAlignment="Center"
                 FontSize="{StaticResource FontSizeMedium}"
-                Foreground="DarkBlue"
                 Text="{x:Bind ViewModel.Architecture, Mode=OneWay}"
                 TextWrapping="NoWrap" />
+
         </StackPanel>
+
     </Grid>
+
 </ContentDialog>

@@ -2,8 +2,6 @@
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
-using PortoPattern.Helpers;
 using PortoPattern.ViewModels;
 using System;
 
@@ -18,66 +16,18 @@ public sealed partial class AboutDialog : ContentDialog
     {
         try
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             // NOTE: Обновляем привязки, когда DialogFactory устанавливает DataContext
-            this.DataContextChanged += (s, e) => Bindings.Update();
+            DataContextChanged += (s, e) => Bindings.Update();
 
-            this.Loaded += AboutDialogOnLoaded;
-            this.Unloaded += AboutDialogOnUnloaded;
-            this.Opened += DialogOnOpened;
-            this.GotFocus += OnGotFocus;
-            this.LostFocus += OnLostFocus;
+            Loaded += AboutDialogOnLoaded;
+            Unloaded += AboutDialogOnUnloaded;
         }
         catch (Exception ex)
         {
 #if DEBUG
             Console.WriteLine($"[ERROR] AboutDialog constructor failed: {ex.Message}");
-#endif
-        }
-    }
-
-    private void OnGotFocus(object sender, RoutedEventArgs e)
-    {
-        try
-        {
-            // Используются те же цвета свечения, что и в старом проекте
-            BloomHelper.AddBloom((UIElement)imgLevel, (UIElement)cdGrid, Windows.UI.Color.FromArgb(230, 11, 203, 239), 12);
-            BloomHelper.AddBloom((UIElement)tbTitle, (UIElement)cdStack, Windows.UI.Color.FromArgb(255, 255, 255, 255), 8);
-        }
-        catch (Exception ex)
-        {
-#if DEBUG
-            Console.WriteLine($"[ERROR] AddBloom failed: {ex.Message}");
-#endif
-        }
-    }
-
-    private void OnLostFocus(object sender, RoutedEventArgs e)
-    {
-        try
-        {
-            BloomHelper.RemoveBloom((UIElement)imgLevel, (UIElement)cdGrid, null);
-            BloomHelper.RemoveBloom((UIElement)tbTitle, (UIElement)cdStack, null);
-        }
-        catch (Exception ex)
-        {
-#if DEBUG
-            Console.WriteLine($"[ERROR] RemoveBloom failed: {ex.Message}");
-#endif
-        }
-    }
-
-    private void AboutDialogOnUnloaded(object sender, RoutedEventArgs e)
-    {
-        try
-        {
-            StoryboardSpin?.Stop();
-        }
-        catch (Exception ex)
-        {
-#if DEBUG
-            Console.WriteLine($"[ERROR] Storyboard stop failed: {ex.Message}");
 #endif
         }
     }
@@ -96,30 +46,16 @@ public sealed partial class AboutDialog : ContentDialog
         }
     }
 
-    private void DialogOnOpened(ContentDialog sender, ContentDialogOpenedEventArgs args)
+    private void AboutDialogOnUnloaded(object sender, RoutedEventArgs e)
     {
         try
         {
-            if (App.Current.Resources.TryGetValue("CardAcrylicBrush", out object brushObj) && brushObj is Microsoft.UI.Xaml.Media.Brush UIBrush)
-            {
-                this.Background = UIBrush;
-            }
-            else
-            {
-                // Резервный программный вариант полностью синхронизирован со значениями CardAcrylicBrush темы Coral Mint (#EA580C)
-                this.Background = new AcrylicBrush
-                {
-                    TintOpacity = 0.25,
-                    TintLuminosityOpacity = 0.15,
-                    TintColor = Windows.UI.Color.FromArgb(255, 234, 88, 12),
-                    FallbackColor = Windows.UI.Color.FromArgb(255, 234, 88, 12)
-                };
-            }
+            StoryboardSpin?.Stop();
         }
         catch (Exception ex)
         {
 #if DEBUG
-            Console.WriteLine($"[ERROR] DialogOnOpened background setup failed: {ex.Message}");
+            Console.WriteLine($"[ERROR] Storyboard stop failed: {ex.Message}");
 #endif
         }
     }

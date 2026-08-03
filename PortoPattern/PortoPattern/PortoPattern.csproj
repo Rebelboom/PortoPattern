@@ -33,13 +33,10 @@
     <None Remove="Controls\TopToolBar.xaml" />
     <None Remove="Dialogs\MatchPolicyDialog.xaml" />
     <None Remove="Dialogs\TestDialog.xaml" />
-    <None Remove="Styles\Brushes\CoralMint.xaml" />
-    <None Remove="Styles\Brushes\Default.xaml" />
-    <None Remove="Styles\Brushes\Obsidian.xaml" />
-    <None Remove="Styles\Obsidian\Dark.xaml" />
-    <None Remove="Styles\Obsidian\Light.xaml" />
-    <None Remove="Styles\Styles.xaml" />
-    <None Remove="Themes\project_dump.txt" />
+    <None Remove="Styles\CoralMint\Brushes\CoralMint.xaml" />
+    <None Remove="Styles\Default\Brushes\Default.xaml" />
+    <None Remove="Styles\Obsidian\Brushes\Obsidian.xaml" />
+    <None Remove="Styles\Midnight\Brushes\Midnight.xaml" />
     <None Remove="Views\AboutDialog.xaml" />
     <None Remove="Views\BlacklistPage.xaml" />
     <None Remove="Views\DetailsPage.xaml" />
@@ -50,12 +47,18 @@
     <Page Remove="Controls\FolderCard.xaml" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Styles\Obsidian\Dark.xaml">
+    <EmbeddedResource Include="Styles\CoralMint\Brushes\CoralMint.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Include="Styles\Obsidian\Light.xaml">
+    <EmbeddedResource Include="Styles\Obsidian\Brushes\Obsidian.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
+	<EmbeddedResource Include="Styles\Default\Brushes\Default.xaml">
+		<Generator>MSBuild:Compile</Generator>
+	</EmbeddedResource>
+	<EmbeddedResource Include="Styles\Midnight\Brushes\Midnight.xaml">
+		<Generator>MSBuild:Compile</Generator>
+	</EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>
@@ -123,6 +126,9 @@
 
 	<ItemGroup>
 	  <Folder Include="Assets\" />
+	  <Folder Include="Styles\CoralMint\Brushes\" />
+	  <Folder Include="Styles\Default\" />
+	  <Folder Include="Styles\Obsidian\Brushes\" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -135,19 +141,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Page Update="Styles\Styles.xaml">
+	  <Page Update="Styles\Midnight\Brushes\Midnight.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </Page>
 	</ItemGroup>
 
 	<ItemGroup>
 	  <Page Update="Styles\Obsidain\ObsidianSystem.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </Page>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Page Update="Styles\Brushes\Obsidian.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </Page>
 	</ItemGroup>
@@ -178,18 +178,6 @@
 
 	<ItemGroup>
 	  <Page Update="Controls\HighlightTextBlock.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </Page>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Page Update="Styles\Brushes\Default.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </Page>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Page Update="Styles\Brushes\CoralMint.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </Page>
 	</ItemGroup>

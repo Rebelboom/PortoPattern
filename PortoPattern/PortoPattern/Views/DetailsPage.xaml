@@ -50,14 +50,14 @@
                         <controls:FolderCard 
                                 SearchText="{Binding ViewModel.SearchText, ElementName=PageRoot}"
                                 HorizontalAlignment="Stretch"
-                                Background="{ThemeResource Porto.Element.Default}"
-                                BorderBrush="{ThemeResource Porto.Border.Default}"
+                                Background="{ThemeResource Rebel.Element.Default}"
+                                BorderBrush="{ThemeResource Rebel.Border.Default}"
                                 BorderThickness="1"
                                 CornerRadius="8"
-                                Foreground="{ThemeResource Porto.Text.Default}"
-                                PointerOverBackgroundCustom="{ThemeResource Porto.Element.Hover}"
-                                PointerOverBorderBrushCustom="{ThemeResource Porto.Border.Hover}"
-                                PointerOverForegroundCustom="{ThemeResource Porto.Text.Hover}"/>
+                                Foreground="{ThemeResource Rebel.Text.Primary}"
+                                PointerOverBackgroundCustom="{ThemeResource Rebel.Element.Hover}"
+                                PointerOverBorderBrushCustom="{ThemeResource Rebel.Border.Hover}"
+                                PointerOverForegroundCustom="{ThemeResource Rebel.Text.Primary}"/>
 
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
